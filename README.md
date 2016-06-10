@@ -21,12 +21,10 @@
 To simulate web service calls, you first need to describe the simulation that will be served up by WSSimulator. Simulations are created in a YAML format. 
 Note, the only required field within a simulation is the path and WSSimulator will fall back to the defaults.
 
-###### Simple Simulation
+###### Simple Simulation that shows you only need to supply a path
 ```yaml
 path: /hello
 ```
-
-And
 
 ###### A More complete Simulation
 ```yaml
@@ -50,25 +48,29 @@ requestStructure: <?xml version="1.0" encoding="UTF-8"?>
 ```
 
 
-# Distribution**
+# Distribution
 There are 2 ways to use WSSimulator as a standalone application or to embed it into an application 
 
 ## In Standalone Mode
 WSSimulator is packaged here and supports been executed on both *nix & windows systems;
 
-
 *	For *nix systems
     -	Unizip the ws-simulator-x.x.zip file to a local directory
     -	Then Call: 
     
-    ./wssimulator <options>
+    ./wssimulator <options> <yaml string>
     
 *	For Windows
     -	Unizip the ws-simulator-x.x.zip file to a local directory
     -	Then Call: 
     
-    ./wssimulator.bat <options>
+    ./wssimulator.bat <options> <yaml string>
 
+### Standalone Example
+
+./wssimulator path:/helloworld
+
+./wssimulator -d /local/directory
 
 ### Options
 
@@ -103,7 +105,7 @@ repositories {
     </dependency>
 ```
 
-### Examples when using within your application
+### Examples when using wssimulator within your application
 
 
 ######  Example with JSON Validation
@@ -125,13 +127,19 @@ public static void main(String[] args) throws URISyntaxException {
 
 Further Example can be found on [here](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests").
 
+### Validation
 
-**Defaults:**
+WSSimulator will validate request call when the ‘requestStructure’ and 'consumes' fields are populated and currently supports XSD & JSON Schema validations. 
+See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for validation examples.
 
-* Http Port: 4567
-* Success Status: 201
-* Bad Request: 400
-* httpMethod: get
-* consumes: text/plain
 
+**Assumed Defaults if not passed in the simulation**
+
+```yaml
+Http Port: 4567
+Success Status: 201
+Bad Request: 400
+httpMethod: get
+consumes: text/plain
+```
 

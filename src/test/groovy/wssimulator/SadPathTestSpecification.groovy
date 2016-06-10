@@ -10,6 +10,6 @@ class SadPathTestSpecification extends Specification {
         then:
         thrown YamlNotValidException
         cleanup:
-        WSSimulator.shutdown();
+        WSSimulator.shutdown()
     }
 }

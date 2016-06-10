@@ -8,18 +8,28 @@ import static org.hamcrest.core.IsEqual.equalTo
 class SOAPTestSpecification extends Specification {
 
     def "Simple simulator Test for SOAP services"() {
-        given:
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
         WSSimulator.addSimulation(new File(getClass().getResource("/soap/wsdl.yml").toURI()))
         WSSimulator.addSimulation(new File(getClass().getResource("/soap/endpoint.yml").toURI()))
-        expect:
-        given().port(4567).get("/currency.wsdl").then().assertThat()
+        println "WHEN FINISHED!!"
+        then:
+        println "THEN STARTED!!"
+
+        given().port(port).get("/currency.wsdl").then().assertThat()
                 .statusCode(201)
-        given().port(4567)
+        given().port(port)
                 .body(new File(getClass().getResource("/soap/payload.xml").toURI()))
                 .post("/CurrencyConvertor.asmx").then().assertThat()
                 .statusCode(201)
+        println "THEN FINISHED!!"
         cleanup:
-        WSSimulator.shutdown();
+        println "CLEANUP STARTEE!!"
+
+        WSSimulator.shutdown()
+
     }
 
 }

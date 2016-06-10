@@ -12,29 +12,35 @@ import static org.hamcrest.core.IsEqual.equalTo
 class JSONWebServiceEmulationSpecification extends Specification {
 
     def "validate good json"() {
-        given:
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
         WSSimulator.addSimulation(new File(getClass().getResource("/json/json1.yml").toURI()))
-        expect:
-        given().port(4567)
+        then:
+        given().port(port)
                 .contentType(ContentType.XML)
                 .body(new File(getClass().getResource("/json/json_good.json").toURI()))
                 .post("/publish").then().assertThat()
                 .statusCode(201).and().body(equalTo("ok"))
         cleanup:
-        WSSimulator.shutdown();
+        WSSimulator.shutdown()
     }
 
     def "validate bad json"() {
-        given:
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
         WSSimulator.addSimulation(new File(getClass().getResource("/json/json1.yml").toURI()))
-        expect:
-        given().port(4567)
+        then:
+        given().port(port)
                 .contentType(ContentType.XML)
                 .body(new File(getClass().getResource("/json/json_bad.json").toURI()))
                 .post("/publish").then().assertThat()
                 .statusCode(400)
         cleanup:
-        WSSimulator.shutdown();
+        WSSimulator.shutdown()
     }
 
 }

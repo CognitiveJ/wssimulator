@@ -2,9 +2,16 @@ package wssimulator;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
+import sun.nio.ch.IOUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,6 +35,9 @@ public class Bootstrap {
             if (cmd.hasOption("y")) {
                 loadFileOrScan(cmd.getOptionValue("y"));
             }
+            if (cmd.hasOption("s")) {
+                printExampleYamlFile();
+            }
             if (cmd.getArgList() != null && cmd.getArgList().size() > 0) {
                 //parse each of them to see if they are a valid specification
                 loadSimulation(cmd.getArgList());
@@ -39,8 +49,20 @@ public class Bootstrap {
         } catch (NumberFormatException nfe) {
             System.err.println("Port address not valid");
             System.exit(1);
+        } catch (URISyntaxException | IOException e) {
+            System.err.println("Can't read sample file");
+            System.exit(1);
         }
 
+    }
+
+    /**
+     * Prints out an example YAML simulation file.
+     */
+    private static void printExampleYamlFile() throws URISyntaxException, IOException {
+        String sample = IOUtils.toString(new FileInputStream(
+                new File(Bootstrap.class.getResource("/example.yml").toURI())), Charset.defaultCharset());
+        System.out.println(sample);
     }
 
     /**
@@ -80,9 +102,9 @@ public class Bootstrap {
     private static Options setupOptions() {
         Options options = new Options();
         Option help = new Option("h", "print this message");
-        Option port = new Option("p", true, "Set the HTTP Port to start the server on (1 to 65535");
-        Option fileOrDirectory = new Option("y", true, "Reference to a single yaml file or to a directory (which will load all *.yml files within the target directory)\n");
-        Option sampleYamlFile = new Option("s", true, "Print out an example YAML file");
+        Option port = new Option("p", true, "Set the HTTP Port to start the server on (1 to 65535)");
+        Option fileOrDirectory = new Option("y", true, "Reference to a single yaml simulation file or a directory which will load all *.yml files within the target directory");
+        Option sampleYamlFile = new Option("s", false, "Print out an sample YAML Simulation file");
         options.addOption(help);
         options.addOption(port);
         options.addOption(fileOrDirectory);

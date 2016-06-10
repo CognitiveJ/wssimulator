@@ -12,18 +12,20 @@ import static org.hamcrest.core.IsEqual.equalTo
  */
 class XMLWebServiceEmulationSpecification extends Specification {
 
-    @Ignore
     def "xmlValidationExample echo test"() {
-        given:
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
         WSSimulator.addSimulation(new File(getClass().getResource("/xml/xmlValidationExample.yml").toURI()))
-        expect:
-        given().port(4567)
+        then:
+        given().port(port)
                 .contentType(ContentType.XML)
                 .body(new File(getClass().getResource("/xml/xmlValidationExample.xml").toURI()))
                 .post("/publish").then().assertThat()
                 .statusCode(201).and().body(equalTo("<results>ok</results>"))
         cleanup:
-        WSSimulator.shutdown();
+        WSSimulator.shutdown()
     }
 
 }

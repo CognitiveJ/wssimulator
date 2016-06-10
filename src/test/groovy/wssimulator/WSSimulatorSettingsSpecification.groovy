@@ -14,14 +14,14 @@ class WSSimulatorSettingsSpecification extends Specification {
 
     def "Test a port change"() {
         int allocatedPort = 1024 + random.nextInt(64000)
-        given:
+        when:
         WSSimulator.setPort(allocatedPort)
         WSSimulator.addSimulation(new File(getClass().getResource("/simple2.yml").toURI()))
-        expect:
+        then:
         given().port(allocatedPort).get("/hello/tester").then().assertThat()
                 .statusCode(201).and().body(equalTo("Hello World tester"))
         cleanup:
-        WSSimulator.shutdown();
+        WSSimulator.shutdown()
     }
 
 }

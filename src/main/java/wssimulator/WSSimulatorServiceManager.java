@@ -84,6 +84,7 @@ public class WSSimulatorServiceManager {
      */
     public void shutdown() {
         LOG.info("Shutting down server");
+        new Exception().printStackTrace();
         Spark.stop();
         validSimulations.clear();
     }

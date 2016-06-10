@@ -18,7 +18,8 @@
 *   Add the dependency from JCenter
 
 
-To simulate web service call, you first need to describe the simulation that will be served by WSSimulator. Simulations are created in a YAML format and the only mandatory field within a simulation is the path of the call.
+To simulate web service calls, you first need to describe the simulation that will be served up by WSSimulator. Simulations are created in a YAML format. 
+Note, the only required field within a simulation is the path and WSSimulator will fall back to the defaults.
 
 ###### Simple Simulation
 ```yaml
@@ -49,30 +50,36 @@ requestStructure: <?xml version="1.0" encoding="UTF-8"?>
 ```
 
 
-Distribution
+# Distribution**
 There are 2 ways to use WSSimulator as a standalone application or to embed it into an application 
 
-In Standalone Mode
+## In Standalone Mode
 WSSimulator is packaged here and supports been executed on both *nix & windows systems;
 
 
 *	For *nix systems
     -	Unizip the ws-simulator-x.x.zip file to a local directory
-    -	Call: ./wssimulator <options>
+    -	Then Call: 
+    
+    ./wssimulator <options>
+    
 *	For Windows
     -	Unizip the ws-simulator-x.x.zip file to a local directory
-    -	Call: ./wssimulator.bat <options>
+    -	Then Call: 
+    
+    ./wssimulator.bat <options>
 
 
-**Standalone Options**
+### Options
 
--y Reference to a single yaml file or to a directory (which will load all *.yml files within the target directory)
+* -y Reference to a single yaml simulation file or a directory which will load all *.yml files within the target directory
+* -s Print out a sample YAML Simulation file
+* -p Set the HTTP Port to start the server on (1 to 65535)
 
-**In Embedded Mode**
-In addition to being able to be launched from the command line, the WSSimulator can be embedded into other JVM applications.  
+## Embedded Mode
+In addition to standalone mode, WSSimulator can be be used within you java application and there is a gateway class called _'WSSimulator'_ which holds a number of static helper methods that manages the launch of simulations. 
 
-Class: WSSimulator
-When using WSSimulator as an embedded library, here is a gateway class called WSSimulator which holds a number of static helper methods that adds simulations for you. 
+### Dependency Management
 
 ###### Gradle
 ```groovy
@@ -96,6 +103,8 @@ repositories {
     </dependency>
 ```
 
+### Examples when using within your application
+
 
 ######  Example with JSON Validation
 ```java
@@ -106,7 +115,7 @@ public static void main(String[] args) throws URISyntaxException {
 ```
 
  
-###### SOAP Example
+###### SOAP Example (Launches valid WSDL & Endpoint Simulations) 
 ```java
 public static void main(String[] args) throws URISyntaxException {
         WSSimulator.addSimulation(new File(SOAPExample.class.getResource("/soap/wsdl.yml").toURI()));
@@ -114,11 +123,15 @@ public static void main(String[] args) throws URISyntaxException {
     }
 ```
 
+Further Example can be found on [here](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests").
+
 
 **Defaults:**
 
 * Http Port: 4567
 * Success Status: 201
 * Bad Request: 400
+* httpMethod: get
+* consumes: text/plain
 
 

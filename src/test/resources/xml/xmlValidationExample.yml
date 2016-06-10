@@ -1,7 +1,7 @@
 path: /publish
 consumes: application/xml
 httpMethod: post
-successResponseCode:201
+successResponseCode: 201
 badRequestResponseCode: 500
 response: <results>ok</results>
 requestStructure: <?xml version="1.0" encoding="UTF-8"?>

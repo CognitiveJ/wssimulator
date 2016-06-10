@@ -1,8 +1,8 @@
-# WSEmulator
+# WSSimulator
  
- [![Circle CI](https://circleci.com/gh/CognitiveJ/wsemulator.png?style=badge)](https://circleci.com/gh/CognitiveJ/wsemaultor)
+ [![Circle CI](https://circleci.com/gh/CognitiveJ/wssimulator.png?style=badge)](https://circleci.com/gh/CognitiveJ/wssimulator)
  
- WSEmulator quickly allows for validation of web service calls and to simulate service call responses. Ideal for when don’t want, or can’t hit real web services.
+ WSSimulator quickly allows for validation of web service calls and to simulate service call responses. Ideal for when don’t want, or can’t hit real web services.
  
  
  **When would you use WSSimulator?**

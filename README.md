@@ -2,7 +2,7 @@
  
  [![Circle CI](https://circleci.com/gh/CognitiveJ/wssimulator.png?style=badge)](https://circleci.com/gh/CognitiveJ/wssimulator)
  
- WSSimulator easily allows for validation of web service calls and simulate their responses. Ideal for when don’t want, or can’t hit real web services.
+ WSSimulator easily allows for validation of web service calls and to simulate their responses. Ideal for when don’t want, or can’t hit real web services.
  
  
  **When would you use WSSimulator?**
@@ -51,7 +51,7 @@ requestStructure: <?xml version="1.0" encoding="UTF-8"?>
 
 
 # Distribution
-There are 2 ways to use WSSimulator as a standalone application or to embed it into an application 
+There are 2 ways to use WSSimulator; as a standalone application or to embed it into an application 
 
 ## In Standalone Mode
 WSSimulator is packaged here and supports been executed on both *nix & windows systems;
@@ -69,13 +69,12 @@ WSSimulator is packaged here and supports been executed on both *nix & windows s
     ./wssimulator.bat <options>
 
 ### Standalone Example
-
-* ./wssimulator -y /local/directory
-* ./wssimulator -y /local/directory/simulation1.yml
-* ./wssimulator -p80 -y /local/directory/simulation1.yml
-
-* ./wssimulator "path:/helloworld"
-
+```shell
+./wssimulator -y /local/directory
+./wssimulator -y /local/directory/simulation1.yml
+./wssimulator -p80 -y /local/directory/simulation1.yml
+./wssimulator "path:/helloworld"
+```
 ### Options
 
 * -y Reference to a single yaml simulation file or a directory which will load all *.yml files within the target directory

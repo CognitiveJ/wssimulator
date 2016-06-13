@@ -331,7 +331,7 @@ public class Bootstrap {
      */
     private static void usage(Options options) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("wssimulator [options] \"[yaml string]\"", options);
+        formatter.printHelp("wssimulator [options] \"[optional yaml string]\"", options);
         System.exit(-1);
     }
 

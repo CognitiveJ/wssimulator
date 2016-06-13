@@ -56,16 +56,16 @@ There are 2 ways to use WSSimulator as a standalone application or to embed it i
 WSSimulator is packaged here and supports been executed on both *nix & windows systems;
 
 *	For *nix systems
-    -	Unizip the ws-simulator-x.x.zip file to a local directory
+    -	Unizip the ws-simulator-0.2.4.zip file to a local directory
     -	Then Call: 
     
-    ./wssimulator <options> <yaml string>
+    ./wssimulator <options>
     
 *	For Windows
-    -	Unizip the ws-simulator-x.x.zip file to a local directory
+    -	Unizip the ws-simulator-0.2.4.zip file to a local directory
     -	Then Call: 
     
-    ./wssimulator.bat <options> <yaml string>
+    ./wssimulator.bat <options>
 
 ### Standalone Example
 
@@ -81,10 +81,13 @@ WSSimulator is packaged here and supports been executed on both *nix & windows s
 * -s Print out a sample YAML Simulation file
 * -p Set the HTTP Port to start the server on (1 to 65535)
 
+
 ## Embedded Mode
-In addition to standalone mode, WSSimulator can be be used within you java application and there is a gateway class called _'WSSimulator'_ which holds a number of static helper methods that manages the launch of simulations. 
+In addition to standalone mode, WSSimulator can be be used within your java application. The gateway class is called _'WSSimulator'_ and holds a number of static helper methods that manages the launch of simulations for you. 
 
 ### Dependency Management
+
+WSSimulator is hosted on jcenter() 
 
 ###### Gradle
 ```groovy
@@ -98,6 +101,7 @@ repositories {
     }
     
 ```
+
 ###### Maven
 ```xml
     <dependency>
@@ -108,8 +112,7 @@ repositories {
     </dependency>
 ```
 
-### Examples when using wssimulator within your application
-
+### Examples when using WSSimulator within your application
 
 ######  Example with JSON/XML Validation
 ```java
@@ -118,7 +121,6 @@ public static void main(String[] args) throws URISyntaxException {
         WSSimulator.addSimulation(new File(ValidationExample.class.getResource("/xml/xmlValidationExample.yml").toURI()));
     }
 ```
-
  
 ###### SOAP Example (Launches valid WSDL & Endpoint Simulations) 
 ```java
@@ -128,7 +130,7 @@ public static void main(String[] args) throws URISyntaxException {
     }
 ```
 
-Further Example can be found on [here](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests").
+Further Examples can be found on [here](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests").
 
 ### Validation
 
@@ -138,7 +140,7 @@ See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groov
 
 
 
-**Assumed Defaults if not passed in the simulation**
+**Assumed Defaults if not passed**
 
 ```yaml
 Http Port: 4567

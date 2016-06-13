@@ -60,14 +60,17 @@ WSSimulator is packaged here and supports been executed on both *nix & windows s
 *	For *nix systems
     -	Unizip the ws-simulator-0.2.5.zip file to a local directory
     -	Then Call: 
-    
-    ./wssimulator <options>
-    
+
+```shell 
+        ./wssimulator <options>
+```
+
 *	For Windows
     -	Unizip the ws-simulator-0.2.5.zip file to a local directory
     -	Then Call: 
-    
+```shell 
     ./wssimulator.bat <options>
+```
 
 ### Standalone Example
 ```shell

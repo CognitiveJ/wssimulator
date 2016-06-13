@@ -212,6 +212,7 @@ import org.jetbrains.annotations.Nullable;
 import spark.Request;
 import spark.Response;
 import wssimulator.WSSimulation;
+import wssimulator.WSSimulator;
 
 import java.util.Map;
 import java.util.Random;
@@ -225,6 +226,7 @@ import java.util.stream.Collectors;
  */
 public abstract class BaseHandler {
 
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
 
     @NotNull
     private final WSSimulation wsSimulation;
@@ -237,11 +239,14 @@ public abstract class BaseHandler {
     @NotNull
     public final Object processRequest(@NotNull Request request, @NotNull Response response) {
         final Map<String, String> params = buildParameterValues(request);
+        LOG.info("request body:{}", request.body());
         if (!validate(wsSimulation, request.body())) {
+            LOG.info("Validation failed for request, returning status code:{}", wsSimulation.badRequestResponseCode);
             response.status(wsSimulation.badRequestResponseCode);
             return "";
         }
         if (resilienceCheck(wsSimulation)) {
+            LOG.info("Resilience Failed, returning status code:{}", wsSimulation.resilienceFailureCode);
             response.status(wsSimulation.resilienceFailureCode);
             return "";
         }
@@ -250,14 +255,15 @@ public abstract class BaseHandler {
         return "";
     }
 
-    private boolean resilienceCheck(WSSimulation wsSimulation) {
+
+    private boolean resilienceCheck(@NotNull WSSimulation wsSimulation) {
         return wsSimulation.resilience < 1 && wsSimulation.resilience - random.nextDouble() <= 0;
     }
 
     protected abstract boolean validate(@NotNull WSSimulation WSSimulation,
                                         @Nullable String body);
 
-    private Map<String, String> buildParameterValues(Request request) {
+    private Map<String, String> buildParameterValues(@NotNull Request request) {
         Map<String, String> params = request
                 .params()
                 .keySet().stream()

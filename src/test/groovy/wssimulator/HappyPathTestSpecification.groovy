@@ -222,7 +222,7 @@ class HappyPathTestSpecification extends Specification {
         given().port(port).get("/hello").then().assertThat()
                 .statusCode(201).and().body(equalTo("hello world"))
         cleanup:
-        WSSimulator.shutdown() 
+        WSSimulator.shutdown()
     }
 
     def "simple2.yaml test"() {
@@ -252,7 +252,7 @@ class HappyPathTestSpecification extends Specification {
         given().port(port).get("/test").then().assertThat()
                 .statusCode(201)
         cleanup:
-        WSSimulator.shutdown() 
+        WSSimulator.shutdown()
     }
 
 
@@ -269,7 +269,7 @@ class HappyPathTestSpecification extends Specification {
         given().port(port).get("/hello/tester").then().assertThat()
                 .statusCode(201).and().body(equalTo("Hello World tester"))
         cleanup:
-        WSSimulator.shutdown() 
+        WSSimulator.shutdown()
     }
 
 

@@ -206,9 +206,7 @@
 package wssimulator
 
 import spock.lang.Specification
-
 import static io.restassured.RestAssured.given
-
 class SOAPTestSpecification extends Specification {
 
     def "Simple simulator Test for SOAP services"() {

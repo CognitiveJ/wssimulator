@@ -49,3 +49,9 @@ jar {
     from rootProject.file('LICENSE')
     from rootProject.file('NOTICE')
 }
+
+
+test.onlyIf {
+    // run tests locally until we get the circleci port issue sorted.
+    Boolean.getBoolean('run.tests')
+}

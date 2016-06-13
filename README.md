@@ -2,7 +2,7 @@
  
  [![Circle CI](https://circleci.com/gh/CognitiveJ/wssimulator.png?style=badge)](https://circleci.com/gh/CognitiveJ/wssimulator)
  
- WSSimulator quickly allows for validation of web service calls and to simulate service call responses. Ideal for when don’t want, or can’t hit real web services.
+ WSSimulator easily allows for validation of web service calls and simulate their responses. Ideal for when don’t want, or can’t hit real web services.
  
  
  **When would you use WSSimulator?**
@@ -19,8 +19,7 @@
 *   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.4/wssimulator-0.2.4.zip "Download Standalone Version")
 
 
-To simulate web service calls, you first need to describe the simulation that will be served by WSSimulator. Simulations are created in a YAML format. 
-Note, the only required field within a simulation is the path and WSSimulator will fall back to the defaults.
+To simulate web service calls, you first need to describe the simulation that will be served by WSSimulator. This is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much as the only required field within a simulation is _path__ and WSSimulator will fill in the rest.
 
 ###### Simple Simulation which shows that you only need to supply a path in order to launch WSSimulator
 ```yaml
@@ -83,7 +82,7 @@ WSSimulator is packaged here and supports been executed on both *nix & windows s
 
 
 ## Embedded Mode
-In addition to standalone mode, WSSimulator can be be used within your java application. The gateway class is called _'WSSimulator'_ and holds a number of static helper methods that manages the launch of simulations for you. 
+In addition to standalone mode, WSSimulator can be be used within your java application. The gateway class is called _WSSimulator_ and holds a number of static helper methods that manages the launch of simulations for you. 
 
 ### Dependency Management
 
@@ -134,10 +133,8 @@ Further Examples can be found on [here](https://github.com/CognitiveJ/wssimulato
 
 ### Validation
 
-WSSimulator will validate request call when the ‘requestStructure’ and 'consumes' fields are populated and currently supports XSD & JSON Schema validations. 
+WSSimulator will validate request call when not the ‘requestStructure’ and 'consumes' fields are populated and currently supports XSD & JSON Schema validations. 
 See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for validation examples.
-
-
 
 
 **Assumed Defaults if not passed**

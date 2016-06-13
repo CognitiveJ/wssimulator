@@ -22,7 +22,7 @@ WSSimulator is a pure Java library that easily allows for you to validate and si
 *   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.4/wssimulator-0.2.4.zip "Download Standalone Version")
 
 
-To simulate web service calls, you first need to describe the simulation. This process is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much to get start as the only required field for you to define is _path__ and WSSimulator will default the other options.
+To simulate web service calls, you first need to describe the simulation. This process is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much to get start as the only required field for you to define is _path_ and WSSimulator will default the other options.
 
 ###### Simple Simulation which shows that you only need to supply a path in order to launch WSSimulator
 ```yaml

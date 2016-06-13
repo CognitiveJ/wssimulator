@@ -83,7 +83,7 @@ WSSimulator is packaged here and supports been executed on both *nix & windows s
 
 
 ## Embedded Mode
-In addition to standalone mode, WSSimulator can be be used within your java application. The gateway class is called _WSSimulator_ and holds a number of static helper methods that manages the launch of simulations for you. 
+In addition to standalone mode, WSSimulator can be be used within your java application as a Java dependency. The gateway class is called _WSSimulator_ (same name as the library) and its holds a number of static helper methods that manages the launch of simulations for you. 
 
 ### Dependency Management
 
@@ -134,7 +134,7 @@ Further Examples can be found on [here](https://github.com/CognitiveJ/wssimulato
 
 ### Validation
 
-WSSimulator will validate request call when not the ‘requestStructure’ and 'consumes' fields are populated and currently supports XSD & JSON Schema validations. 
+WSSimulator will validate request call when not the _requestStructure_ and _consumes_ fields are populated and currently supports XSD & JSON Schema validations. 
 See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for validation examples.
 
 

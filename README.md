@@ -2,7 +2,8 @@
  
  [![Circle CI](https://circleci.com/gh/CognitiveJ/wssimulator.png?style=badge)](https://circleci.com/gh/CognitiveJ/wssimulator)
  
- WSSimulator easily allows for validation of web service calls and to simulate their responses. Ideal for when don’t want, or can’t hit real web services.
+WSSimulator is a pure Java library that easily allows for you to validate and simulate web service calls and responses. Ideal for when don’t want, or can’t hit real web services.
+
  
  
  **When would you use WSSimulator?**
@@ -10,7 +11,7 @@
  
  *	For Integration level tests when real web service calls cannot be made (for example, when the producing service does not yet exist, costs prohibit calling services within tests or the service isn’t accessible).
  *	When you quickly want to serve up static repeatable content over HTTP.
- *  You need to validate the structure of your outbound requests against a schema an external service expects
+ *  You need to validate the structure of your outbound requests against a schema that an external service will be expecting.
  *  Check your outbound service ability to handle failure (resilience) 
  
  
@@ -21,7 +22,7 @@
 *   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.4/wssimulator-0.2.4.zip "Download Standalone Version")
 
 
-To simulate web service calls, you first need to describe the simulation that will be served by WSSimulator. This is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much as the only required field within a simulation is _path__ and WSSimulator will fill in the rest.
+To simulate web service calls, you first need to describe the simulation. This process is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much to get start as the only required field for you to define is _path__ and WSSimulator will default the other options.
 
 ###### Simple Simulation which shows that you only need to supply a path in order to launch WSSimulator
 ```yaml
@@ -138,7 +139,7 @@ WSSimulator will validate request call when not the _requestStructure_ and _cons
 See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for validation examples.
 
 
-### Validation
+### Resilience
 
 WSSimulator can simulate random failures when the _resilience_ field is set below 1 with a 0 value meaning that the simulation will always failing. _resilienceFailureCode_ allows you to set the failure response code to send back when failure does occur
 See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for more examples.

@@ -19,7 +19,7 @@ WSSimulator is a pure Java library that easily allows for you to validate and si
 **Getting Started**
 
 *   Java 8
-*   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.4/wssimulator-0.2.4.zip "Download Standalone Version")
+*   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.5/wssimulator-0.2.5.zip "Download Standalone Version")
 
 
 To simulate web service calls, you first need to describe the simulation. This process is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much to get start as the only required field for you to define is _path_ and WSSimulator will default the other options.
@@ -58,13 +58,13 @@ There are 2 ways to use WSSimulator; as a standalone application or to embed it 
 WSSimulator is packaged here and supports been executed on both *nix & windows systems;
 
 *	For *nix systems
-    -	Unizip the ws-simulator-0.2.4.zip file to a local directory
+    -	Unizip the ws-simulator-0.2.5.zip file to a local directory
     -	Then Call: 
     
     ./wssimulator <options>
     
 *	For Windows
-    -	Unizip the ws-simulator-0.2.4.zip file to a local directory
+    -	Unizip the ws-simulator-0.2.5.zip file to a local directory
     -	Then Call: 
     
     ./wssimulator.bat <options>
@@ -97,7 +97,7 @@ repositories {
     }
     
     dependencies {
-    compile "cognitivej:wssimulator:0.2.4"
+    compile "cognitivej:wssimulator:0.2.5"
     ...
     }
     
@@ -108,7 +108,7 @@ repositories {
     <dependency>
       <groupId>cognitivej</groupId>
       <artifactId>wssimulator</artifactId>
-      <version>0.2.4</version>
+      <version>0.2.5</version>
       <type>pom</type>
     </dependency>
 ```

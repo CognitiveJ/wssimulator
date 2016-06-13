@@ -12,7 +12,8 @@ WSSimulator is a pure Java library that easily allows for you to validate and si
  *	For Integration level tests when real web service calls cannot be made (for example, when the producing service does not yet exist, costs prohibit calling services within tests or the service isn’t accessible).
  *	When you quickly want to serve up static repeatable content over HTTP.
  *  You need to validate the structure of your outbound requests against a schema that an external service will be expecting.
- *  Check your outbound service ability to handle failure (resilience) 
+ *  Validate that your code calling services can handle failure (resilience)
+ 
  
  
 

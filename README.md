@@ -1,25 +1,28 @@
 # WSSimulator
  
+ [![Circle CI](https://circleci.com/gh/CognitiveJ/wssimulator.png?style=badge)](https://circleci.com/gh/CognitiveJ/wssimulator)
+ 
  WSSimulator quickly allows for validation of web service calls and to simulate service call responses. Ideal for when don’t want, or can’t hit real web services.
  
  
  **When would you use WSSimulator?**
 
  
- *	For Integration level tests when real web service calls cannot be made (for example, when the producing service doesn’t exist, costs money to call the service or isn’t accessible from the system running).
- *	When you quickly want to serve up static content over HTTP  for 3rd party applications to consume.
+ *	For Integration level tests when real web service calls cannot be made (for example, when the producing service does not yet exist, costs prohibit calling services within tests or the service isn’t accessible).
+ *	When you quickly want to serve up static repeatable content over HTTP.
+ 
  
 
 **Getting Started**
 
 *   Java 8
-*   Add the dependency from JCenter
+*   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.4/wssimulator-0.2.4.zip "Download Standalone Version")
 
 
-To simulate web service calls, you first need to describe the simulation that will be served up by WSSimulator. Simulations are created in a YAML format. 
+To simulate web service calls, you first need to describe the simulation that will be served by WSSimulator. Simulations are created in a YAML format. 
 Note, the only required field within a simulation is the path and WSSimulator will fall back to the defaults.
 
-###### Simple Simulation that shows you only need to supply a path
+###### Simple Simulation which shows that you only need to supply a path in order to launch WSSimulator
 ```yaml
 path: /hello
 ```
@@ -66,9 +69,11 @@ WSSimulator is packaged here and supports been executed on both *nix & windows s
 
 ### Standalone Example
 
-./wssimulator path:/helloworld
+* ./wssimulator -y /local/directory
+* ./wssimulator -y /local/directory/simulation1.yml
+* ./wssimulator -p80 -y /local/directory/simulation1.yml
 
-./wssimulator -d /local/directory
+* ./wssimulator "path:/helloworld"
 
 ### Options
 
@@ -106,11 +111,11 @@ repositories {
 ### Examples when using wssimulator within your application
 
 
-######  Example with JSON Validation
+######  Example with JSON/XML Validation
 ```java
 public static void main(String[] args) throws URISyntaxException {
-        WSSimulator.addSimulation(new File(SOAPExample.class.getResource("/soap/wsdl.yml").toURI()));
-        WSSimulator.addSimulation(new File(SOAPExample.class.getResource("/soap/endpoint.yml").toURI()));
+        WSSimulator.addSimulation(new File(ValidationExample.class.getResource("/json/json1.yml").toURI()));
+        WSSimulator.addSimulation(new File(ValidationExample.class.getResource("/xml/xmlValidationExample.yml").toURI()));
     }
 ```
 
@@ -129,6 +134,8 @@ Further Example can be found on [here](https://github.com/CognitiveJ/wssimulator
 
 WSSimulator will validate request call when the ‘requestStructure’ and 'consumes' fields are populated and currently supports XSD & JSON Schema validations. 
 See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for validation examples.
+
+
 
 
 **Assumed Defaults if not passed in the simulation**

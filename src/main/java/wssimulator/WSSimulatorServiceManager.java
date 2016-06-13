@@ -250,27 +250,27 @@ public class WSSimulatorServiceManager {
         switch (simulation.httpMethod) {
             case get:
                 get(simulation.path, handler::processRequest);
-                LOG.info("GET {} now listing", simulation.path);
+                LOG.info("GET {} now listening", simulation.path);
                 break;
             case post:
                 post(simulation.path, handler::processRequest);
-                LOG.info("POST {} now listing", simulation.path);
+                LOG.info("POST {} now listening", simulation.path);
                 break;
             case put:
                 put(simulation.path, handler::processRequest);
-                LOG.info("PUT {} now listing", simulation.path);
+                LOG.info("PUT {} now listening", simulation.path);
                 break;
             case patch:
                 patch(simulation.path, handler::processRequest);
-                LOG.info("PATCH {} now listing", simulation.path);
+                LOG.info("PATCH {} now listening", simulation.path);
                 break;
             case delete:
                 delete(simulation.path, handler::processRequest);
-                LOG.info("DELETE {} now listing", simulation.path);
+                LOG.info("DELETE {} now listening", simulation.path);
                 break;
             case head:
                 head(simulation.path, handler::processRequest);
-                LOG.info("HEAD {} now listing", simulation.path);
+                LOG.info("HEAD {} now listening", simulation.path);
                 break;
         }
     }

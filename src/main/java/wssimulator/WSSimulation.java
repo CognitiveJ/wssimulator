@@ -250,6 +250,15 @@ public class WSSimulation {
      */
     public int badRequestResponseCode = 400;
 
+    /**
+     * Resilience of this server (0 to 1); 1 meaning it never fails and 0 meaning it always will fail.
+     */
+    public double resilience = 1;
+    /**
+     * failure code to pass back to the client when the server fails
+     */
+    public int resilienceFailureCode = 500;
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

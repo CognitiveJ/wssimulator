@@ -10,6 +10,8 @@
  
  *	For Integration level tests when real web service calls cannot be made (for example, when the producing service does not yet exist, costs prohibit calling services within tests or the service isn’t accessible).
  *	When you quickly want to serve up static repeatable content over HTTP.
+ *  You need to validate the structure of your outbound requests against a schema an external service expects
+ *  Check your outbound service ability to handle failure (resilience) 
  
  
 
@@ -137,6 +139,12 @@ WSSimulator will validate request call when not the ‘requestStructure’ and '
 See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for validation examples.
 
 
+### Validation
+
+WSSimulator can simulate random failures when the _resilience_ field is set below 1 with a 0 value meaning that the simulation will always failing. _resilienceFailureCode_ allows you to set the failure response code to send back when failure does occur
+See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for more examples.
+
+
 **Assumed Defaults if not passed**
 
 ```yaml
@@ -145,5 +153,7 @@ Success Status: 201
 Bad Request: 400
 httpMethod: get
 consumes: text/plain
+resilience: 1
+resilienceFailureCode: 501
 ```
 

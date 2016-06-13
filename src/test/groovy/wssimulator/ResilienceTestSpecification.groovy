@@ -203,67 +203,26 @@
  *
  */
 
-package wssimulator.handler;
+package wssimulator
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import spark.Request;
-import spark.Response;
-import wssimulator.WSSimulation;
+import spock.lang.Specification
 
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Collectors;
+import static io.restassured.RestAssured.given
+import static org.hamcrest.core.IsEqual.equalTo
 
+class ResilienceTestSpecification extends Specification {
 
-/**
- * Base handler for handling http requests to the server.
- * This base class has a common features and delegates to specialised classes
- * based on the 'consumes' data element.
- */
-public abstract class BaseHandler {
-
-
-    @NotNull
-    private final WSSimulation wsSimulation;
-    private final Random random = new Random();
-
-    public BaseHandler(@NotNull WSSimulation wsSimulation) {
-        this.wsSimulation = wsSimulation;
+    def "Simple simulator Test using file: resilience.yml"() {
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
+        WSSimulator.addSimulation(new File(getClass().getResource("/resilience.yml").toURI()))
+        then:
+        given().port(port).get("/hello").then().assertThat()
+                .statusCode(501)
+        cleanup:
+        WSSimulator.shutdown()
     }
 
-    @NotNull
-    public final Object processRequest(@NotNull Request request, @NotNull Response response) {
-        final Map<String, String> params = buildParameterValues(request);
-        if (!validate(wsSimulation, request.body())) {
-            response.status(wsSimulation.badRequestResponseCode);
-            return "";
-        }
-        if (resilienceCheck(wsSimulation)) {
-            response.status(wsSimulation.resilienceFailureCode);
-            return "";
-        }
-        if (StringUtils.isNotEmpty(wsSimulation.response))
-            return new StrSubstitutor(params).replace(wsSimulation.response);
-        return "";
-    }
-
-    private boolean resilienceCheck(WSSimulation wsSimulation) {
-        return wsSimulation.resilience < 1 && wsSimulation.resilience - random.nextDouble() <= 0;
-    }
-
-    protected abstract boolean validate(@NotNull WSSimulation WSSimulation,
-                                        @Nullable String body);
-
-    private Map<String, String> buildParameterValues(Request request) {
-        Map<String, String> params = request
-                .params()
-                .keySet().stream()
-                .collect(Collectors
-                        .toMap(p -> String.format("param.%s", p.substring(1)),
-                                request::params));
-        return params;
-    }
 }

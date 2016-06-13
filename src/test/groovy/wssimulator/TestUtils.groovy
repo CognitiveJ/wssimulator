@@ -212,6 +212,6 @@ class TestUtils {
     static Random rand = new Random()
 
     static int randomPort() {
-        rand.nextInt(64000) + 1024
+        rand.nextInt(500) + 55000
     }
 }

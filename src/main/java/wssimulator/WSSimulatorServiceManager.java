@@ -296,7 +296,7 @@ public class WSSimulatorServiceManager {
     /**
      * Returns the valid simulation count.
      *
-     * @return the number of valid specifiation.
+     * @return the number of valid specifications.
      */
     public int validSimulationCount() {
         return validSimulations.size();

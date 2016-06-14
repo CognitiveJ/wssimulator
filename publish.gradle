@@ -1,0 +1,66 @@
+def versionString = file('src/main/resources/wssimulator-version.txt').text.trim()
+group = 'cognitivej'
+version = versionString
+
+// custom tasks for creating source/javadoc jars
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+    javadoc.failOnError = false
+}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+task release() {
+    dependsOn 'assemble', 'bintrayUpload'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintray_user') ? bintray_user : ''
+    key = project.hasProperty('bintray_api_key') ? bintray_api_key : ''
+    publications = ['mavenJava']
+    dryRun = false
+    publish = true
+    pkg {
+        repo = 'CognitiveJ'
+        name = 'wssimulator'
+        desc = 'Web Service Simulator'
+        websiteUrl = 'https://github.com/CognitiveJ/wssimulator'
+        issueTrackerUrl = 'https://github.com/CognitiveJ/wssimulator/issues'
+        vcsUrl = 'https://github.com/CognitiveJ/wssimulator.git'
+        licenses = ['Apache-2.0']
+        labels = ['wssimulator', 'java', 'Web Service Simulator']
+        publicDownloadNumbers = true
+        //Optional version descriptor
+        version {
+            name = project.version
+            released = new Date()
+            mavenCentralSync {
+                sync = false //Optional (true by default). Determines whether to sync the version to Maven Central.
+                user = 'userToken' //OSS user token
+                password = 'paasword' //OSS user password
+                close = '1'
+            }
+        }
+    }
+}
+
+

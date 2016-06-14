@@ -2,9 +2,7 @@
  
  [![Circle CI](https://circleci.com/gh/CognitiveJ/wssimulator.png?style=badge)](https://circleci.com/gh/CognitiveJ/wssimulator)
  
-WSSimulator is a pure Java library that easily allows for you to validate and simulate web service calls and responses. Ideal for when don’t want, or can’t hit real web services.
-
- 
+WSSimulator is an open source library that easily allows for you to simulate external web service calls and responses. Useful for when can not interact with external web services but need to still test the interactions. 
  
  **When would you use WSSimulator?**
 
@@ -53,7 +51,7 @@ requestStructure: <?xml version="1.0" encoding="UTF-8"?>
 
 
 # Distribution
-There are 2 ways to use WSSimulator; as a standalone application or to embed it into an application 
+There are 2 ways to use WSSimulator; as a standalone application or as an embedded Java library;
 
 ## In Standalone Mode
 WSSimulator is packaged here and supports been executed on both *nix & windows systems;

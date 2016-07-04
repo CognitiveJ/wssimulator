@@ -1,7 +1,5 @@
 # WSSimulator
  
- [![Circle CI](https://circleci.com/gh/CognitiveJ/wssimulator.png?style=badge)](https://circleci.com/gh/CognitiveJ/wssimulator)
- 
 WSSimulator is an open source library that easily allows for you to simulate external web service calls and responses. Useful for when can not interact with external web services but need to still test the interactions. 
  
  **When would you use WSSimulator?**

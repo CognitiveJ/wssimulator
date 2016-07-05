@@ -217,7 +217,7 @@ import java.util.Collection;
  */
 public final class WSSimulator {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
-    private static WSSimulatorServiceManager wsSimulatorServiceManager = new WSSimulatorServiceManager();
+    private static WSSimulatorServiceManager wsSimulatorServiceManager = WSSimulatorServiceManager.getInstance();
 
     /**
      * Apply a simulation to be emulated
@@ -226,6 +226,17 @@ public final class WSSimulator {
      */
     public static void addSimulation(@NotNull String yamlString) {
         YamlToSimulation yamlToSimulation = new YamlToSimulation(yamlString);
+        wsSimulatorServiceManager.add(yamlToSimulation.simulatorSimulation());
+    }
+
+
+    /**
+     * Apply a simulation to be emulated
+     *
+     * @param classpathLocation YAML location on classpath
+     */
+    public static void addSimulationOnClasspath(@NotNull String classpathLocation) {
+        YamlToSimulation yamlToSimulation = new YamlToSimulation(new File(WSSimulator.class.getResource(classpathLocation).getFile()));
         wsSimulatorServiceManager.add(yamlToSimulation.simulatorSimulation());
     }
 

@@ -12,13 +12,11 @@ WSSimulator is an open source library that easily allows for you to simulate ext
  *  You need to validate the structure of your outbound requests against a schema that an external service will be expecting.
  *  Validate that your code calling services can handle failure (resilience)
  
- 
- 
 
 **Getting Started**
 
 *   Java 8
-*   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.5/wssimulator-0.2.5.zip "Download Standalone Version")
+*   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.6/wssimulator-0.2.6.zip "Download Standalone Version")
 
 
 To simulate web service calls, you first need to describe the simulation. This process is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much to get start as the only required field for you to define is _path_ and WSSimulator will default the other options.
@@ -57,7 +55,7 @@ There are 2 ways to use WSSimulator; as a standalone application or as an embedd
 WSSimulator is packaged here and supports been executed on both *nix & windows systems;
 
 *	For *nix systems
-    -	Unizip the ws-simulator-0.2.5.zip file to a local directory
+    -	Unizip the ws-simulator-0.2.6.zip file to a local directory
     -	Then Call: 
 
 ```shell 
@@ -65,7 +63,7 @@ WSSimulator is packaged here and supports been executed on both *nix & windows s
 ```
 
 *	For Windows
-    -	Unizip the ws-simulator-0.2.5.zip file to a local directory
+    -	Unizip the ws-simulator-0.2.6.zip file to a local directory
     -	Then Call: 
 ```shell 
     ./wssimulator.bat <options>
@@ -99,7 +97,7 @@ repositories {
     }
     
     dependencies {
-    compile "cognitivej:wssimulator:0.2.5"
+    compile "cognitivej:wssimulator:0.2.6"
     ...
     }
     
@@ -110,7 +108,7 @@ repositories {
     <dependency>
       <groupId>cognitivej</groupId>
       <artifactId>wssimulator</artifactId>
-      <version>0.2.5</version>
+      <version>0.2.6</version>
       <type>pom</type>
     </dependency>
 ```
@@ -143,7 +141,7 @@ See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groov
 
 ### Resilience
 
-WSSimulator can simulate random failures when the _resilience_ field is set below 1 with a 0 value meaning that the simulation will always failing. _resilienceFailureCode_ allows you to set the failure response code to send back when failure does occur
+WSSimulator can simulate random failures when the resilience field is set below 1 with a 0 value meaning that the simulation will always fail. resilienceFailureCode allows you to set the failure response code.
 See [Tests](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests") for more examples.
 
 

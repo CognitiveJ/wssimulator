@@ -224,7 +224,7 @@ class WSSimulatorSettingsSpecification extends Specification {
         WSSimulator.addSimulation(new File(getClass().getResource("/simple2.yml").toURI()))
         then:
         given().port(allocatedPort).get("/hello/tester").then().assertThat()
-                .statusCode(201).and().body(equalTo("Hello World tester"))
+                .statusCode(200).and().body(equalTo("Hello World tester"))
         cleanup:
         WSSimulator.shutdown()
     }

@@ -23,7 +23,6 @@ repositories {
 sourceCompatibility = 1.8
 
 
-
 dependencies {
     compile "com.sparkjava:spark-core:2.5"
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.7.4"

@@ -207,6 +207,7 @@ package wssimulator;
 
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spark.Spark;
 import wssimulator.handler.BaseHandler;
 import wssimulator.handler.GenericHandler;
@@ -214,7 +215,9 @@ import wssimulator.handler.JSONHandler;
 import wssimulator.handler.XMLHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static spark.Spark.*;
 
@@ -222,11 +225,49 @@ import static spark.Spark.*;
  * Manages the service raise
  */
 public class WSSimulatorServiceManager {
+    private int counter = 0;
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulatorServiceManager.class);
 
+    private WSSimulatorServiceManager() {
+    }
 
-    private List<WSSimulation> validSimulations = new ArrayList<>();
+    public List<Integer> getWSSimulationsKeys() {
+        return new ArrayList<>(validSimulations.keySet());
+    }
+
+
+    /**
+     * Initializes singleton.
+     *
+     * @see https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
+     */
+    private static class SingletonHolder {
+        private static final WSSimulatorServiceManager INSTANCE = startup();
+    }
+
+    /**
+     * Returns the instance for this singleton
+     *
+     * @return the instance
+     */
+    @NotNull
+    public static WSSimulatorServiceManager getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+
+
+    /**
+     * Set the singleton for this manager.
+     *
+     * @return the created singleton
+     */
+    @NotNull
+    private static WSSimulatorServiceManager startup() {
+        return new WSSimulatorServiceManager();
+    }
+
+    private Map<Integer, WSSimulation> validSimulations = new HashMap<>();
 
     /**
      * Adds and starts a web service simulator simulation
@@ -246,7 +287,7 @@ public class WSSimulatorServiceManager {
     private void setupRoute(@NotNull WSSimulation simulation) {
 
         BaseHandler handler = handler(simulation);
-        validSimulations.add(simulation);
+        validSimulations.put(counter++, simulation);
         switch (simulation.httpMethod) {
             case get:
                 get(simulation.path, handler::processRequest);
@@ -300,6 +341,18 @@ public class WSSimulatorServiceManager {
      */
     public int validSimulationCount() {
         return validSimulations.size();
+    }
+
+
+    /**
+     * returns a simulation if available (by simulation id).
+     *
+     * @param simulationId The id of the simulation.
+     * @return the wssimulation or null if not found.
+     */
+    @Nullable
+    public WSSimulation getWSSimulation(int simulationId) {
+        return validSimulations.get(simulationId);
     }
 
 

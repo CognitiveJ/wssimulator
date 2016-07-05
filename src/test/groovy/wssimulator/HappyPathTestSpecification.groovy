@@ -220,7 +220,7 @@ class HappyPathTestSpecification extends Specification {
         WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
         then:
         given().port(port).get("/hello").then().assertThat()
-                .statusCode(201).and().body(equalTo("hello world"))
+                .statusCode(200).and().body(equalTo("hello world"))
         cleanup:
         WSSimulator.shutdown()
     }
@@ -233,7 +233,7 @@ class HappyPathTestSpecification extends Specification {
         WSSimulator.addSimulation(new File(getClass().getResource("/simple2.yml").toURI()))
         then:
         given().port(port).get("/hello/tester").then().assertThat()
-                .statusCode(201).and().body(equalTo("Hello World tester"))
+                .statusCode(200).and().body(equalTo("Hello World tester"))
         cleanup:
         WSSimulator.shutdown()
     }
@@ -248,9 +248,9 @@ class HappyPathTestSpecification extends Specification {
         then:
         WSSimulator.loadedSimulationCount() == 2
         given().port(port).get("/hello/tester").then().assertThat()
-                .statusCode(201).and().body(equalTo("Hello World tester"))
+                .statusCode(200).and().body(equalTo("Hello World tester"))
         given().port(port).get("/test").then().assertThat()
-                .statusCode(201)
+                .statusCode(200)
         cleanup:
         WSSimulator.shutdown()
     }
@@ -267,7 +267,24 @@ class HappyPathTestSpecification extends Specification {
         then:
         WSSimulator.loadedSimulationCount() == 1
         given().port(port).get("/hello/tester").then().assertThat()
-                .statusCode(201).and().body(equalTo("Hello World tester"))
+                .statusCode(200).and().body(equalTo("Hello World tester"))
+        cleanup:
+        WSSimulator.shutdown()
+    }
+
+    def "test passing YAML in as a classpath"() {
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
+        WSSimulator.addSimulationOnClasspath("/simple2.yml")
+        WSSimulator.addSimulationOnClasspath("/simple3.yml")
+        then:
+        WSSimulator.loadedSimulationCount() == 2
+        given().port(port).get("/hello/tester").then().assertThat()
+                .statusCode(200).and().body(equalTo("Hello World tester"))
+        given().port(port).get("/test").then().assertThat()
+                .statusCode(200)
         cleanup:
         WSSimulator.shutdown()
     }

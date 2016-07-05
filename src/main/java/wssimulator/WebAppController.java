@@ -203,33 +203,135 @@
  *
  */
 
-package wssimulator
+package wssimulator;
 
-import io.restassured.http.ContentType
-import spock.lang.Specification
 
-import static io.restassured.RestAssured.given
-import static org.hamcrest.core.IsEqual.equalTo
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import spark.Request;
+import spark.Response;
+import spark.Route;
+import spark.Spark;
+
+import static spark.Spark.staticFiles;
+import static wssimulator.WSSimulatorServiceManager.getInstance;
 
 /**
- * Tests reading all yaml files for XML files.
+ * Controls the web application.
  */
-class XMLWebServiceEmulationSpecification extends Specification {
+public class WebAppController implements Route {
 
-    def "xmlValidationExample echo test"() {
-        setup:
-        int port = TestUtils.randomPort()
-        when:
-        WSSimulator.setPort(port)
-        WSSimulator.addSimulation(new File(getClass().getResource("/xml/xmlValidationExample.yml").toURI()))
-        then:
-        given().port(port)
-                .contentType(ContentType.XML)
-                .body(new File(getClass().getResource("/xml/xmlValidationExample.xml").toURI()))
-                .post("/publish").then().assertThat()
-                .statusCode(200).and().body(equalTo("<results>ok</results>"))
-        cleanup:
-        WSSimulator.shutdown()
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WebAppController.class);
+    private String baseRoute = "/wssimulator";
+    private String route = baseRoute + "/:simulation";
+
+    /**
+     * Starts the web application
+     */
+    public void startWebApp() {
+        LOG.info("Starting web application on route against static files in '/web' ");
+        staticFiles.location("/web");
+        Spark.put(baseRoute, this);
+        Spark.patch(route, this);
+        Spark.delete(route, this);
+        Spark.get(baseRoute, this);
+        Spark.get(route, this);
     }
 
+    @Override
+    public Object handle(Request request, Response response) throws Exception {
+        String simulationId = request.params("simulation");
+        LOG.info("Simulation {} received for {}", simulationId, request.requestMethod());
+        switch (HttpMethod.valueOf(request.requestMethod().toLowerCase())) {
+            case get:
+                return getSimulations(simulationId, request, response);
+            case post:
+                throw new IllegalArgumentException("Not Implemented");
+            case put:
+                return putSimulation(request, response);
+            case patch:
+                return patchSimulation(simulationId, request, response);
+            case delete:
+                return deleteSimulation(simulationId, request, response);
+            case head:
+                throw new IllegalArgumentException("Not Implemented");
+        }
+
+        throw new IllegalArgumentException("Not Implemented");
+    }
+
+    /**
+     * @param request  the Request
+     * @param response the Response
+     * @return the ID of the created simulation
+     */
+    @NotNull
+    private Object putSimulation(@NotNull Request request, @NotNull Response response) {
+        return noOpCreated(response);
+    }
+
+    /**
+     * Deletes a simulation by its giving Id
+     *
+     * @param simulationId the simulation to be deleted.
+     * @param request      the request received
+     * @param response     the response to send the information back.
+     * @return the response of the delte
+     */
+    @NotNull
+    private Object deleteSimulation(@NotNull String simulationId, @NotNull Request request, @NotNull Response response) {
+        return null;
+    }
+
+    /**
+     * Returns the simulation in a YML format.
+     *
+     * @param simulationId if setted, will return the YAML of that simulation
+     * @param request      the request.
+     * @param response     the response.
+     * @return the simulation as YAML or a list of integers.
+     */
+    @NotNull
+    private Object getSimulations(@Nullable String simulationId, @NotNull Request request, @NotNull Response response) {
+        if (StringUtils.isEmpty(simulationId))
+            return getInstance().getWSSimulationsKeys();
+        return toYaml(getInstance().getWSSimulation(Integer.valueOf(simulationId)));
+    }
+
+    /**
+     * Creates Yaml from a wsSimulation instance
+     *
+     * @param wsSimulation the simulation to be converted
+     * @return the YAML
+     */
+    @NotNull
+    private String toYaml(@Nullable WSSimulation wsSimulation) {
+        return "";
+    }
+
+    /**
+     * Carry out the patched operations.
+     *
+     * @param simulationId the simulation to be patched
+     * @param request      the request
+     * @param response     the response
+     * @return The default response
+     */
+    private String patchSimulation(@NotNull String simulationId, @NotNull Request request, @NotNull Response response) {
+        return noOpCreated(response);
+    }
+
+
+    /**
+     * Utility method to return a no op created response
+     *
+     * @param response the response to be returned
+     * @return a blank string
+     */
+    @NotNull
+    private String noOpCreated(@NotNull Response response) {
+        response.status(201);
+        return "";
+    }
 }

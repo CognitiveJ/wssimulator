@@ -227,7 +227,7 @@ class JSONWebServiceEmulationSpecification extends Specification {
                 .contentType(ContentType.XML)
                 .body(new File(getClass().getResource("/json/json_good.json").toURI()))
                 .post("/publish").then().assertThat()
-                .statusCode(201).and().body(equalTo("ok"))
+                .statusCode(200).and().body(equalTo("ok"))
         cleanup:
         WSSimulator.shutdown()
     }

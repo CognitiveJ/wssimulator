@@ -229,6 +229,10 @@ public class Bootstrap {
         final CommandLineParser parser = new DefaultParser();
         try {
             CommandLine cmd = parser.parse(options, args);
+
+            if (cmd.hasOption("w")) {
+                webApp(options);
+            }
             if (cmd.hasOption("h")) {
                 usage(options);
             }
@@ -257,6 +261,16 @@ public class Bootstrap {
             System.exit(1);
         }
 
+    }
+
+    /**
+     * Invokes the launch of the web-application
+     *
+     * @param options
+     */
+    private static void webApp(Options options) {
+        WebAppController webAppController = new WebAppController();
+        webAppController.startWebApp();
     }
 
     /**
@@ -305,9 +319,11 @@ public class Bootstrap {
     private static Options setupOptions() {
         Options options = new Options();
         Option help = new Option("h", "print this message");
+        Option web = new Option("w", "Starts the web application");
         Option port = new Option("p", true, "Set the HTTP Port to start the server on (1 to 65535)");
         Option fileOrDirectory = new Option("y", true, "Reference to a single yaml simulation file or a directory which will load all *.yml files within the target directory");
         Option sampleYamlFile = new Option("s", false, "Print out an sample YAML Simulation file");
+        options.addOption(web);
         options.addOption(help);
         options.addOption(port);
         options.addOption(fileOrDirectory);

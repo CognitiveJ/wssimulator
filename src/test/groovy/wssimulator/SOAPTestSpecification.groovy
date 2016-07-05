@@ -221,11 +221,11 @@ class SOAPTestSpecification extends Specification {
         println "THEN STARTED!!"
 
         given().port(port).get("/currency.wsdl").then().assertThat()
-                .statusCode(201)
+                .statusCode(200)
         given().port(port)
                 .body(new File(getClass().getResource("/soap/payload.xml").toURI()))
                 .post("/CurrencyConvertor.asmx").then().assertThat()
-                .statusCode(201)
+                .statusCode(200)
         println "THEN FINISHED!!"
         cleanup:
         println "CLEANUP STARTEE!!"

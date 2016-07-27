@@ -206,6 +206,7 @@
 package wssimulator;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -258,6 +259,12 @@ public class WSSimulation {
      * failure code to pass back to the client when the server fails
      */
     public int resilienceFailureCode = 500;
+
+    /**
+     * Context object for this simulation
+     */
+    @JsonIgnore
+    public final WSSimulationContext wsSimulationContext=new WSSimulationContext();
 
     @Override
     public String toString() {

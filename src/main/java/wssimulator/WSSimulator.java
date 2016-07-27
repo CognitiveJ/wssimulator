@@ -244,9 +244,10 @@ public final class WSSimulator {
      * Apply a simulation to be emulated
      *
      * @param WSSimulation the WSSimulation
+     * @return the id of this simulation
      */
-    public static void addSimulation(@NotNull WSSimulation WSSimulation) {
-        wsSimulatorServiceManager.add(WSSimulation);
+    public static int addSimulation(@NotNull WSSimulation WSSimulation) {
+        return wsSimulatorServiceManager.add(WSSimulation);
     }
 
 
@@ -254,10 +255,11 @@ public final class WSSimulator {
      * Adds a simulation from a YAML file
      *
      * @param echoSimulationAsYaml the yaml file
+     * @return the id of this simulation
      */
-    public static void addSimulation(@NotNull File echoSimulationAsYaml) {
+    public static int addSimulation(@NotNull File echoSimulationAsYaml) {
         YamlToSimulation yamlToSimulation = new YamlToSimulation(echoSimulationAsYaml);
-        addSimulation(yamlToSimulation.simulatorSimulation());
+        return addSimulation(yamlToSimulation.simulatorSimulation());
     }
 
     /**
@@ -301,5 +303,24 @@ public final class WSSimulator {
      */
     public static int loadedSimulationCount() {
         return wsSimulatorServiceManager.validSimulationCount();
+    }
+
+    /**
+     * Holds the times a simulation has been called.
+     * @param simulationId - the simulation id
+     * @return the number of times a service has been called.
+     */
+    public static int calledCount(int simulationId) {
+        return wsSimulatorServiceManager.calledCounter(simulationId);
+    }
+
+    /**
+     * Return the ID of a simulation path based on its logical path
+     * @param path the path that the simulation
+     * @return the id or -1 if not loaded.
+     */
+    public static int findSimulationIdByPath(@NotNull String path)
+    {
+        return wsSimulatorServiceManager.findSimulationIdByPath(path);
     }
 }

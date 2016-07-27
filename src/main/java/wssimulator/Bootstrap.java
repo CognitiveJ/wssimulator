@@ -248,7 +248,6 @@ public class Bootstrap {
             if (cmd.getArgList() != null && cmd.getArgList().size() > 0) {
                 //parse each of them to see if they are a valid specification
                 loadSimulation(cmd.getArgList());
-
             }
         } catch (ParseException exp) {
             System.err.println("Parsing failed.  Reason: " + exp.getMessage());
@@ -265,7 +264,6 @@ public class Bootstrap {
 
     /**
      * Invokes the launch of the web-application
-     *
      * @param options
      */
     private static void webApp(Options options) {

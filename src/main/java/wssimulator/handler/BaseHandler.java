@@ -240,6 +240,7 @@ public abstract class BaseHandler {
     public final Object processRequest(@NotNull Request request, @NotNull Response response) {
         final Map<String, String> params = buildParameterValues(request);
         LOG.info("request body:{}", request.body());
+        wsSimulation.wsSimulationContext.callCount++;
         if (!validate(wsSimulation, request.body())) {
             LOG.info("Validation failed for request, returning status code:{}", wsSimulation.badRequestResponseCode);
             response.status(wsSimulation.badRequestResponseCode);

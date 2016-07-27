@@ -263,7 +263,6 @@ class HappyPathTestSpecification extends Specification {
         WSSimulator.setPort(port)
         WSSimulator.addSimulation("path: /hello/:name\n" +
                 "response: Hello World \${param.name}")
-
         then:
         WSSimulator.loadedSimulationCount() == 1
         given().port(port).get("/hello/tester").then().assertThat()

@@ -203,182 +203,57 @@
  *
  */
 
-package wssimulator;
+package wssimulator
 
+import spock.lang.Specification
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import spark.Spark;
-import wssimulator.handler.BaseHandler;
-import wssimulator.handler.GenericHandler;
-import wssimulator.handler.JSONHandler;
-import wssimulator.handler.XMLHandler;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static spark.Spark.*;
+import static io.restassured.RestAssured.given
+import static org.hamcrest.core.IsEqual.equalTo
 
 /**
- * Manages the service raise
+ * Tests related around the the endpoint called counterfeatures within wssimulator
  */
-public class WSSimulatorServiceManager {
-    private int counter = 0;
+class CalledCounterTestSpecification extends Specification {
 
-    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulatorServiceManager.class);
-
-    private WSSimulatorServiceManager() {
+    def "Simple simulator Test using file: simple.yaml"() {
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
+        int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
+        then:
+        given().port(port).get("/hello").then().assertThat()
+                .statusCode(200).and().body(equalTo("hello world"))
+        given().port(port).get("/hello").then().assertThat()
+                .statusCode(200).and().body(equalTo("hello world"))
+        WSSimulator.calledCount(addedSimulationId) == 2;
+        cleanup:
+        WSSimulator.shutdown()
     }
 
-    public List<Integer> getWSSimulationsKeys() {
-        return new ArrayList<>(validSimulations.keySet());
+    def "simulator Test to lookup path"() {
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
+        int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
+        int foundSimulationId = WSSimulator.findSimulationIdByPath("/hello")
+        then:
+        addedSimulationId == foundSimulationId
+        cleanup:
+        WSSimulator.shutdown()
     }
 
-
-    /**
-     * Initializes singleton.
-     *
-     * @see https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
-     */
-    private static class SingletonHolder {
-        private static final WSSimulatorServiceManager INSTANCE = startup();
+    def "simulator Test to lookup path that is not found"() {
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
+        int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
+        int foundSimulationId = WSSimulator.findSimulationIdByPath("/notfound")
+        then:
+        addedSimulationId != foundSimulationId
+        cleanup:
+        WSSimulator.shutdown()
     }
-
-    /**
-     * Returns the instance for this singleton
-     *
-     * @return the instance
-     */
-    @NotNull
-    public static WSSimulatorServiceManager getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
-
-
-    /**
-     * Set the singleton for this manager.
-     *
-     * @return the created singleton
-     */
-    @NotNull
-    private static WSSimulatorServiceManager startup() {
-        return new WSSimulatorServiceManager();
-    }
-
-    private Map<Integer, WSSimulation> validSimulations = new HashMap<>();
-
-    /**
-     * Adds and starts a web service simulator simulation
-     *
-     * @param simulation the simulation to be added
-     * @return the id of this simulation
-     */
-    public int add(@NotNull WSSimulation simulation) {
-        WSSimulatorValidation.validate(simulation);
-        return setupRoute(simulation);
-    }
-
-    /**
-     * Sets up a new route within spark.
-     *
-     * @param simulation the simulator simulation to setup.
-     */
-    private int setupRoute(@NotNull WSSimulation simulation) {
-        BaseHandler handler = handler(simulation);
-        validSimulations.put(++counter, simulation);
-        switch (simulation.httpMethod) {
-            case get:
-                get(simulation.path, handler::processRequest);
-                LOG.info("GET {} now listening", simulation.path);
-                break;
-            case post:
-                post(simulation.path, handler::processRequest);
-                LOG.info("POST {} now listening", simulation.path);
-                break;
-            case put:
-                put(simulation.path, handler::processRequest);
-                LOG.info("PUT {} now listening", simulation.path);
-                break;
-            case patch:
-                patch(simulation.path, handler::processRequest);
-                LOG.info("PATCH {} now listening", simulation.path);
-                break;
-            case delete:
-                delete(simulation.path, handler::processRequest);
-                LOG.info("DELETE {} now listening", simulation.path);
-                break;
-            case head:
-                head(simulation.path, handler::processRequest);
-                LOG.info("HEAD {} now listening", simulation.path);
-                break;
-        }
-        return counter;
-    }
-
-    private BaseHandler handler(@NotNull WSSimulation wsSimulation) {
-        if ("application/xml".equals(wsSimulation.consumes))
-            return new XMLHandler(wsSimulation);
-        else if ("application/json".equals(wsSimulation.consumes))
-            return new JSONHandler(wsSimulation);
-
-        return new GenericHandler(wsSimulation);
-    }
-
-    /**
-     * Shuts down the simulator.
-     */
-    public void shutdown() {
-        LOG.info("Shutting down server");
-        Spark.stop();
-        validSimulations.clear();
-    }
-
-    /**
-     * Returns the valid simulation count.
-     *
-     * @return the number of valid specifications.
-     */
-    public int validSimulationCount() {
-        return validSimulations.size();
-    }
-
-
-    /**
-     * returns a simulation if available (by simulation id).
-     *
-     * @param simulationId The id of the simulation.
-     * @return the wssimulation or null if not found.
-     */
-    @Nullable
-    public WSSimulation getWSSimulation(int simulationId) {
-        WSSimulation wsSimulation = validSimulations.get(simulationId);
-        if (wsSimulation == null)
-            throw new SimulationNotFoundException(simulationId);
-        return wsSimulation;
-    }
-
-    /**
-     * The current call count for a simulation
-     *
-     * @param simulationId the Simulation ID
-     * @return the current call count.
-     */
-    public int calledCounter(int simulationId) {
-        WSSimulation wsSimulation = getWSSimulation(simulationId);
-        return wsSimulation.wsSimulationContext.callCount;
-    }
-
-    public int findSimulationIdByPath(@NotNull String path) {
-        return validSimulations.entrySet()
-                .stream()
-                .filter(e-> e.getValue().path.equalsIgnoreCase(path))
-                .findFirst()
-                .map(Map.Entry::getKey)
-                .orElse(-1);
-
-    }
-
-
 }

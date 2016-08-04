@@ -211,11 +211,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spark.Request;
 import spark.Response;
+import wssimulator.RouteRequestFilterType;
 import wssimulator.WSSimulation;
 import wssimulator.WSSimulator;
 
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -228,34 +228,55 @@ public abstract class BaseHandler {
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
 
-    @NotNull
-    private final WSSimulation wsSimulation;
+
+    private Map<RouteRequestFilterType, RouteRequestFilterer> filterTypes = new HashMap<RouteRequestFilterType, RouteRequestFilterer>() {{
+        put(RouteRequestFilterType.none, new NoneRouteRequestFilterer());
+        put(RouteRequestFilterType.contains, new ContainsRouteRequestFilterer());
+    }};
+
+    private final List<WSSimulation> wsSimulations = new ArrayList<>();
     private final Random random = new Random();
 
-    public BaseHandler(@NotNull WSSimulation wsSimulation) {
-        this.wsSimulation = wsSimulation;
+    public BaseHandler(@NotNull WSSimulation wsSimulations) {
+        this.wsSimulations.add(wsSimulations);
     }
 
     @NotNull
     public final Object processRequest(@NotNull Request request, @NotNull Response response) {
         final Map<String, String> params = buildParameterValues(request);
         LOG.info("request body:{}", request.body());
-        wsSimulation.wsSimulationContext.callCount++;
-        if (!validate(wsSimulation, request.body())) {
-            LOG.info("Validation failed for request, returning status code:{}", wsSimulation.badRequestResponseCode);
-            response.status(wsSimulation.badRequestResponseCode);
-            return "";
+        //find the correct simulation to use
+        WSSimulation wsSimulation = loadSimulation(request);
+        if (wsSimulation != null) {
+            wsSimulation.wsSimulationContext.callCount++;
+            if (!validate(wsSimulation, request.body())) {
+                LOG.info("Validation failed for request, returning status code:{}", wsSimulation.badRequestResponseCode);
+                response.status(wsSimulation.badRequestResponseCode);
+                return "";
+            }
+            if (resilienceCheck(wsSimulation)) {
+                LOG.info("Resilience Failed, returning status code:{}", wsSimulation.resilienceFailureCode);
+                response.status(wsSimulation.resilienceFailureCode);
+                return "";
+            }
+            if (StringUtils.isNotEmpty(wsSimulation.response))
+                return new StrSubstitutor(params).replace(wsSimulation.response);
         }
-        if (resilienceCheck(wsSimulation)) {
-            LOG.info("Resilience Failed, returning status code:{}", wsSimulation.resilienceFailureCode);
-            response.status(wsSimulation.resilienceFailureCode);
-            return "";
-        }
-        if (StringUtils.isNotEmpty(wsSimulation.response))
-            return new StrSubstitutor(params).replace(wsSimulation.response);
         return "";
     }
 
+
+    @Nullable
+    private WSSimulation loadSimulation(@Nullable Request request) {
+        if (wsSimulations.size() == 1)
+            return wsSimulations.get(0);
+
+        for (WSSimulation wsSimulation : wsSimulations) {
+            if (filterTypes.get(wsSimulation.request.filterType).filter(wsSimulation, request))
+                return wsSimulation;
+        }
+        return null;
+    }
 
     private boolean resilienceCheck(@NotNull WSSimulation wsSimulation) {
         return wsSimulation.resilience < 1 && wsSimulation.resilience - random.nextDouble() <= 0;
@@ -272,5 +293,23 @@ public abstract class BaseHandler {
                         .toMap(p -> String.format("param.%s", p.substring(1)),
                                 request::params));
         return params;
+    }
+
+    /**
+     * Return the route count that this handler manages
+     *
+     * @return
+     */
+    public int routeCount() {
+        return wsSimulations.size();
+    }
+
+    /**
+     * Adds a route to this handler
+     *
+     * @param simulation a simulation that will be added.
+     */
+    public void addRoute(@NotNull WSSimulation simulation) {
+        wsSimulations.add(simulation);
     }
 }

@@ -236,10 +236,11 @@ public class WSSimulation {
      */
     public String response;
 
+
     /**
-     * Validate the structure of the request.
+     * Holds request logic for validation/filtering
      */
-    public String requestStructure;
+    public WSSimulatorRequest request = new WSSimulatorRequest();
 
     /**
      * sets the successful response code to send back to the server
@@ -264,7 +265,7 @@ public class WSSimulation {
      * Context object for this simulation
      */
     @JsonIgnore
-    public final WSSimulationContext wsSimulationContext=new WSSimulationContext();
+    public final WSSimulationContext wsSimulationContext = new WSSimulationContext();
 
     @Override
     public String toString() {

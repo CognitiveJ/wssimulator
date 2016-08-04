@@ -205,6 +205,8 @@
 
 package wssimulator
 
+import java.util.concurrent.TimeUnit
+
 /**
  *
  */
@@ -212,6 +214,10 @@ class TestUtils {
     static Random rand = new Random()
 
     static int randomPort() {
-        rand.nextInt(500) + 55000
+        rand.nextInt(5000) + 55000
+    }
+
+    static void waitFor(long duration, TimeUnit unit) {
+        Thread.sleep(unit.toMillis(duration))
     }
 }

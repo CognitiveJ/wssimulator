@@ -211,6 +211,7 @@ import spark.Spark;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Base simulator for web services.
@@ -307,6 +308,7 @@ public final class WSSimulator {
 
     /**
      * Holds the times a simulation has been called.
+     *
      * @param simulationId - the simulation id
      * @return the number of times a service has been called.
      */
@@ -316,11 +318,12 @@ public final class WSSimulator {
 
     /**
      * Return the ID of a simulation path based on its logical path
-     * @param path the path that the simulation
+     *
+     * @param path       the path that the simulation
+     * @param httpMethod the httpmethod of the specification
      * @return the id or -1 if not loaded.
      */
-    public static int findSimulationIdByPath(@NotNull String path)
-    {
-        return wsSimulatorServiceManager.findSimulationIdByPath(path);
+    public static int findSimulationId(@NotNull String path, @NotNull HttpMethod httpMethod) {
+        return wsSimulatorServiceManager.findSimulationIdByPath(path, httpMethod);
     }
 }

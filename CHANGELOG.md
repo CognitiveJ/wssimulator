@@ -1,3 +1,6 @@
+# 0.2.8 (29/07/2016)
+- Added request routing feature
+
 # 0.2.7 (24/07/2016)
 - Added 'Called Times' feature sets
 - More Bug fixes and fixing failing tests

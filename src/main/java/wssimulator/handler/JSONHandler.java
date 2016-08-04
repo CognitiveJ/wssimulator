@@ -224,8 +224,8 @@ public class JSONHandler extends BaseHandler {
 
     @Override
     protected boolean validate(@NotNull WSSimulation simulatorSimulation, @Nullable String body) {
-        if (isNotEmpty(simulatorSimulation.requestStructure) && isNotEmpty(body))
-            return validateJSON(simulatorSimulation.requestStructure, body);
+        if (isNotEmpty(simulatorSimulation.request.requestStructure) && isNotEmpty(body))
+            return validateJSON(simulatorSimulation.request.requestStructure, body);
         return true;
 
     }

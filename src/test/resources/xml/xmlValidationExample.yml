@@ -4,14 +4,15 @@ httpMethod: post
 successResponseCode: 201
 badRequestResponseCode: 500
 response: <results>ok</results>
-requestStructure: <?xml version="1.0" encoding="UTF-8"?>
-                   <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-                              xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                       <xs:element name="customer" type="customerType"/>
-                       <xs:complexType name="customerType">
-                           <xs:sequence>
-                               <xs:element type="xs:string" name="name"/>
-                               <xs:element type="xs:string" name="address"/>
-                           </xs:sequence>
-                       </xs:complexType>
-                   </xs:schema>
+request:
+        requestStructure: <?xml version="1.0" encoding="UTF-8"?>
+                          <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+                                    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                             <xs:element name="customer" type="customerType"/>
+                             <xs:complexType name="customerType">
+                                 <xs:sequence>
+                                     <xs:element type="xs:string" name="name"/>
+                                     <xs:element type="xs:string" name="address"/>
+                                 </xs:sequence>
+                             </xs:complexType>
+                         </xs:schema>

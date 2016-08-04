@@ -2,7 +2,9 @@ path: /publish
 consumes: application/json
 httpMethod: post
 response: ok
-requestStructure: |
+request:
+          requestStructure: |
+
                         {
                                                           "$schema": "http://json-schema.org/draft-04/schema#",
                                                           "title": "/etc/fstab",

@@ -210,17 +210,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wssimulator.WSSimulation;
 
+import java.util.List;
+
 /**
  * Handles all other media types
  */
 public class GenericHandler extends BaseHandler {
 
-    public GenericHandler(@NotNull WSSimulation WSSimulation) {
-        super(WSSimulation);
+    public GenericHandler(@NotNull WSSimulation wsSimulations) {
+        super(wsSimulations);
     }
 
     @Override
-    protected boolean validate(@NotNull WSSimulation WSSimulation, @Nullable String body) {
+    protected boolean validate(@NotNull WSSimulation wsSimulation, @Nullable String body) {
         return true;
     }
 }

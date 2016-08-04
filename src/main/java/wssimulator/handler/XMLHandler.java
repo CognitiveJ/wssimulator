@@ -224,8 +224,8 @@ public class XMLHandler extends BaseHandler {
 
     @Override
     protected boolean validate(@NotNull WSSimulation WSSimulation, @Nullable String body) {
-        if (isNotEmpty(WSSimulation.requestStructure) && isNotEmpty(body))
-            return validateXml(WSSimulation.requestStructure, body);
+        if (isNotEmpty(WSSimulation.request.requestStructure) && isNotEmpty(body))
+            return validateXml(WSSimulation.request.requestStructure, body);
         return true;
 
     }

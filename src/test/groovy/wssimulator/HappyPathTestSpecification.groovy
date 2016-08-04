@@ -207,6 +207,8 @@ package wssimulator
 
 import spock.lang.Specification
 
+import java.util.concurrent.TimeUnit
+
 import static io.restassured.RestAssured.given
 import static org.hamcrest.core.IsEqual.equalTo
 
@@ -280,11 +282,14 @@ class HappyPathTestSpecification extends Specification {
         WSSimulator.addSimulationOnClasspath("/simple3.yml")
         then:
         WSSimulator.loadedSimulationCount() == 2
+        println "rest assured - opening"
+        TestUtils.waitFor(10, TimeUnit.SECONDS)
         given().port(port).get("/hello/tester").then().assertThat()
                 .statusCode(200).and().body(equalTo("Hello World tester"))
         given().port(port).get("/test").then().assertThat()
                 .statusCode(200)
         cleanup:
+        println "last yaml - shutting down"
         WSSimulator.shutdown()
     }
 

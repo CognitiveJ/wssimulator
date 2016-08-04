@@ -237,7 +237,7 @@ class CalledCounterTestSpecification extends Specification {
         when:
         WSSimulator.setPort(port)
         int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
-        int foundSimulationId = WSSimulator.findSimulationIdByPath("/hello")
+        int foundSimulationId = WSSimulator.findSimulationId("/hello",HttpMethod.get)
         then:
         addedSimulationId == foundSimulationId
         cleanup:
@@ -250,7 +250,7 @@ class CalledCounterTestSpecification extends Specification {
         when:
         WSSimulator.setPort(port)
         int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
-        int foundSimulationId = WSSimulator.findSimulationIdByPath("/notfound")
+        int foundSimulationId = WSSimulator.findSimulationId("/notfound",HttpMethod.get)
         then:
         addedSimulationId != foundSimulationId
         cleanup:

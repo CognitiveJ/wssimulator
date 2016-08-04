@@ -1,4 +1,5 @@
-path: /hello
+path: /payment
+request: action: allocate
 consumes: application/xml
 httpMethod: post
 response: I expect this as the response

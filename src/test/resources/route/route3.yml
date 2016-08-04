@@ -1,0 +1,6 @@
+path: /publish
+httpMethod: post
+request:
+        filterType: contains
+        filter: Action3
+response: FilteredByAction3

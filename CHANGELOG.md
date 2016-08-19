@@ -1,3 +1,6 @@
+# 0.2.8 (20/08/2016)
+- Bug fixes
+
 # 0.2.8 (29/07/2016)
 - Added request routing feature
 

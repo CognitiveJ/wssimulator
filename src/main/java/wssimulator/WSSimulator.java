@@ -226,6 +226,7 @@ public final class WSSimulator {
      * @param yamlString YAML as a String
      */
     public static void addSimulation(@NotNull String yamlString) {
+        LOG.info("adding simulation string: {}", yamlString);
         YamlToSimulation yamlToSimulation = new YamlToSimulation(yamlString);
         wsSimulatorServiceManager.add(yamlToSimulation.simulatorSimulation());
     }
@@ -237,6 +238,7 @@ public final class WSSimulator {
      * @param classpathLocation YAML location on classpath
      */
     public static void addSimulationOnClasspath(@NotNull String classpathLocation) {
+        LOG.info("adding simulation on classpath: {}", classpathLocation);
         YamlToSimulation yamlToSimulation = new YamlToSimulation(new File(WSSimulator.class.getResource(classpathLocation).getFile()));
         wsSimulatorServiceManager.add(yamlToSimulation.simulatorSimulation());
     }
@@ -259,6 +261,7 @@ public final class WSSimulator {
      * @return the id of this simulation
      */
     public static int addSimulation(@NotNull File echoSimulationAsYaml) {
+        LOG.info("adding simulation file: {}", echoSimulationAsYaml);
         YamlToSimulation yamlToSimulation = new YamlToSimulation(echoSimulationAsYaml);
         return addSimulation(yamlToSimulation.simulatorSimulation());
     }
@@ -267,6 +270,7 @@ public final class WSSimulator {
      * Shuts down the simulator
      */
     public static void shutdown() {
+        LOG.info("Shutting down server");
         wsSimulatorServiceManager.shutdown();
     }
 
@@ -276,6 +280,7 @@ public final class WSSimulator {
      * @param port the port number
      */
     public static void setPort(int port) {
+        LOG.info("setting port to {}", port);
         Spark.port(port);
     }
 

@@ -218,6 +218,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static spark.Spark.*;
 
@@ -227,6 +228,7 @@ import static spark.Spark.*;
 public class WSSimulatorServiceManager {
     private int counter = 0;
     private Map<String, BaseHandler> handlers = new HashMap<>();
+    private Map<Integer, WSSimulation> validSimulations = new HashMap<>();
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulatorServiceManager.class);
 
@@ -268,7 +270,7 @@ public class WSSimulatorServiceManager {
         return new WSSimulatorServiceManager();
     }
 
-    private Map<Integer, WSSimulation> validSimulations = new HashMap<>();
+
 
     /**
      * Adds and starts a web service simulator simulation
@@ -340,9 +342,10 @@ public class WSSimulatorServiceManager {
      * Shuts down the simulator.
      */
     public void shutdown() {
-        LOG.info("Shutting down server");
         Spark.stop();
         validSimulations.clear();
+        handlers.clear();
+        counter=0;
     }
 
     /**

@@ -226,10 +226,7 @@ class SOAPTestSpecification extends Specification {
                 .body(new File(getClass().getResource("/soap/payload.xml").toURI()))
                 .post("/CurrencyConvertor.asmx").then().assertThat()
                 .statusCode(200)
-        println "THEN FINISHED!!"
         cleanup:
-        println "CLEANUP STARTEE!!"
-
         WSSimulator.shutdown()
 
     }

@@ -321,6 +321,18 @@ public final class WSSimulator {
         return wsSimulatorServiceManager.calledCounter(simulationId);
     }
 
+
+    /**
+     * Returns the last request for a given simulation.
+     *
+     * @param simulationId - the simulation id
+     * @return the the text of the last request
+     */
+    public static String lastRequest(int simulationId) {
+        return wsSimulatorServiceManager.lastRequest(simulationId);
+    }
+
+
     /**
      * Return the ID of a simulation path based on its logical path
      *

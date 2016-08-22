@@ -14,7 +14,7 @@ WSSimulator is an open source library that easily allows for you to simulate ext
 **Getting Started**
 
 *   Java 8
-*   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.9/wssimulator-0.2.9.zip "Download Standalone Version")
+*   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.10/wssimulator-0.2.10.zip "Download Standalone Version")
 
 
 To simulate web service calls, you first need to describe the simulation. This process is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much to get start as the only required field for you to define is _path_ and WSSimulator will default the other options.
@@ -54,7 +54,7 @@ There are 2 ways to use WSSimulator; as a standalone application or as an embedd
 WSSimulator is packaged here and supports been executed on both *nix & windows systems;
 
 *	For *nix systems
-    -	Unizip the ws-simulator-0.2.9.zip file to a local directory
+    -	Unizip the ws-simulator-0.2.10.zip file to a local directory
     -	Then Call: 
 
 ```shell 
@@ -62,7 +62,7 @@ WSSimulator is packaged here and supports been executed on both *nix & windows s
 ```
 
 *	For Windows
-    -	Unizip the ws-simulator-0.2.9.zip file to a local directory
+    -	Unizip the ws-simulator-0.2.10.zip file to a local directory
     -	Then Call: 
 ```shell 
     ./wssimulator.bat <options>
@@ -96,7 +96,7 @@ repositories {
     }
     
     dependencies {
-    compile "cognitivej:wssimulator:0.2.9"
+    compile "cognitivej:wssimulator:0.2.10"
     ...
     }
     
@@ -107,7 +107,7 @@ repositories {
     <dependency>
       <groupId>cognitivej</groupId>
       <artifactId>wssimulator</artifactId>
-      <version>0.2.9</version>
+      <version>0.2.10</version>
       <type>pom</type>
     </dependency>
 ```
@@ -171,3 +171,23 @@ request:
          filter: Hello World
 ```
 _Filters by any request containing the phrase 'Hello World'_
+
+### Call Count & Last Request
+
+WSSimulator can return the total call count and the last route request body for routes. For example 
+
+```java
+ int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/lastRequest/request.yml").toURI()))
+ given().port(port)
+                .contentType(ContentType.XML)
+                .body("Last Request - 1")
+                .post("/hello");
+
+        given().port(port)
+                .contentType(ContentType.XML)
+                .body("Last Request - 2")
+                .post("/hello");
+
+        WSSimulator.calledCount(addedSimulationId) == 2;
+        WSSimulator.lastRequest(addedSimulationId) == "Last Request - 2";     
+```

@@ -1,4 +1,8 @@
-# 0.2.8 (20/08/2016)
+# 0.2.10 (21/08/2016)
+- Bug fixes
+- Added the ability to retrieve the last request from the route
+
+# 0.2.9 (20/08/2016)
 - Bug fixes
 
 # 0.2.8 (29/07/2016)

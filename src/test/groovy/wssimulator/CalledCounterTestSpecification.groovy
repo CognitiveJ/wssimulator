@@ -230,30 +230,4 @@ class CalledCounterTestSpecification extends Specification {
         cleanup:
         WSSimulator.shutdown()
     }
-
-    def "simulator Test to lookup path"() {
-        setup:
-        int port = TestUtils.randomPort()
-        when:
-        WSSimulator.setPort(port)
-        int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
-        int foundSimulationId = WSSimulator.findSimulationId("/hello",HttpMethod.get)
-        then:
-        addedSimulationId == foundSimulationId
-        cleanup:
-        WSSimulator.shutdown()
-    }
-
-    def "simulator Test to lookup path that is not found"() {
-        setup:
-        int port = TestUtils.randomPort()
-        when:
-        WSSimulator.setPort(port)
-        int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
-        int foundSimulationId = WSSimulator.findSimulationId("/notfound",HttpMethod.get)
-        then:
-        addedSimulationId != foundSimulationId
-        cleanup:
-        WSSimulator.shutdown()
-    }
 }

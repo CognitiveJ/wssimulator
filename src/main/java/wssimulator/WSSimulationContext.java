@@ -212,4 +212,5 @@ public class WSSimulationContext {
      * Holds the call count for this simulation
      */
     public int callCount;
+    public String lastRequest;
 }

@@ -211,7 +211,6 @@ import spark.Spark;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Base simulator for web services.
@@ -247,9 +246,9 @@ public final class WSSimulator {
      * Apply a simulation to be emulated
      *
      * @param WSSimulation the WSSimulation
-     * @return the id of this simulation
+     * @return the WSSimulationContext of this simulation
      */
-    public static int addSimulation(@NotNull WSSimulation WSSimulation) {
+    public static WSSimulationContext addSimulation(@NotNull WSSimulation WSSimulation) {
         return wsSimulatorServiceManager.add(WSSimulation);
     }
 
@@ -258,9 +257,9 @@ public final class WSSimulator {
      * Adds a simulation from a YAML file
      *
      * @param echoSimulationAsYaml the yaml file
-     * @return the id of this simulation
+     * @return the WSSimulationContext of this simulation
      */
-    public static int addSimulation(@NotNull File echoSimulationAsYaml) {
+    public static WSSimulationContext addSimulation(@NotNull File echoSimulationAsYaml) {
         LOG.info("adding simulation file: {}", echoSimulationAsYaml);
         YamlToSimulation yamlToSimulation = new YamlToSimulation(echoSimulationAsYaml);
         return addSimulation(yamlToSimulation.simulatorSimulation());
@@ -316,6 +315,7 @@ public final class WSSimulator {
      *
      * @param simulationId - the simulation id
      * @return the number of times a service has been called.
+     * @deprecated use {@link WSSimulationContext#callCount()}
      */
     public static int calledCount(int simulationId) {
         return wsSimulatorServiceManager.calledCounter(simulationId);
@@ -327,6 +327,7 @@ public final class WSSimulator {
      *
      * @param simulationId - the simulation id
      * @return the the text of the last request
+     * @deprecated use {@link WSSimulationContext#lastMessage()} ()}
      */
     public static String lastRequest(int simulationId) {
         return wsSimulatorServiceManager.lastRequest(simulationId);
@@ -341,6 +342,20 @@ public final class WSSimulator {
      * @return the id or -1 if not loaded.
      */
     public static int findSimulationId(@NotNull String path, @NotNull HttpMethod httpMethod) {
-        return wsSimulatorServiceManager.findSimulationIdByPath(path, httpMethod);
+        int simulationIdByPath = wsSimulatorServiceManager.findSimulationIdByPath(path, httpMethod);
+        return simulationIdByPath;
+    }
+
+    /**
+     * Return simulation path based on its logical path
+     *
+     * @param path       the path that the simulation
+     * @param httpMethod the httpmethod of the specification
+     * @return the found simulation
+     * @throws SimulationNotFoundException
+     */
+    public static WSSimulation findSimulation(@NotNull String path, @NotNull HttpMethod httpMethod) {
+        int simulationId = findSimulationId(path, httpMethod);
+        return wsSimulatorServiceManager.getWSSimulation(simulationId);
     }
 }

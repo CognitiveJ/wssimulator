@@ -208,20 +208,21 @@ package wssimulator
 import io.restassured.http.ContentType
 import spock.lang.Specification
 
+import java.util.concurrent.TimeUnit
+
 import static io.restassured.RestAssured.given
-import static org.hamcrest.core.IsEqual.equalTo
 
 /**
  * Tests related around the the endpoint called counterfeatures within wssimulator
  */
-class LastRequestTestSpecification extends Specification {
+class WSResponseTestSpecification extends Specification {
 
     def "Simple simulator Test using file: simple.yaml"() {
         setup:
         int port = TestUtils.randomPort()
         when:
         WSSimulator.setPort(port)
-        int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/lastRequest/request.yml").toURI()))
+        def simulationResponse = WSSimulator.addSimulation(new File(getClass().getResource("/lastRequest/request.yml").toURI()))
         then:
         given().port(port)
                 .contentType(ContentType.XML)
@@ -234,8 +235,50 @@ class LastRequestTestSpecification extends Specification {
                 .post("/hello");
 
 
-        WSSimulator.calledCount(addedSimulationId) == 2;
-        WSSimulator.lastRequest(addedSimulationId) == "Last Request - 2";
+        simulationResponse.callCount() == 2;
+        simulationResponse.lastMessage() == "Last Request - 2";
+        cleanup:
+        WSSimulator.shutdown()
+    }
+
+    def "Simple simulator Test using file: simple.yaml with a countdown hatch"() {
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
+        def simulationResponse = WSSimulator.addSimulation(new File(getClass().getResource("/lastRequest/request.yml").toURI()))
+        new Timer().runAfter(10000) {
+            given().port(port)
+                    .contentType(ContentType.XML)
+                    .body("Latch example")
+                    .post("/hello");
+        }
+        then:
+
+        simulationResponse.blockUntilCalled()
+        simulationResponse.callCount() == 1;
+        simulationResponse.lastMessage() == "Latch example";
+        cleanup:
+        WSSimulator.shutdown()
+    }
+
+    def "Simple simulator Test using file: simple.yaml with a countdown hatch that times out"() {
+        setup:
+        int port = TestUtils.randomPort()
+        when:
+        WSSimulator.setPort(port)
+        def simulationResponse = WSSimulator.addSimulation(new File(getClass().getResource("/lastRequest/request.yml").toURI()))
+        new Timer().runAfter(10000) {
+            given().port(port)
+                    .contentType(ContentType.XML)
+                    .body("Latch example")
+                    .post("/hello");
+        }
+        then:
+
+        simulationResponse.blockUntilCalled(5, TimeUnit.SECONDS)
+        simulationResponse.callCount() == 0;
+
         cleanup:
         WSSimulator.shutdown()
     }

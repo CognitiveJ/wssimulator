@@ -248,8 +248,7 @@ public abstract class BaseHandler {
         //find the correct simulation to use
         WSSimulation wsSimulation = loadSimulation(request);
         if (wsSimulation != null) {
-            wsSimulation.wsSimulationContext.callCount++;
-            wsSimulation.wsSimulationContext.lastRequest = request.body();
+            wsSimulation.wsSimulationContext.simulationInvoked(request.body());
             if (!validate(wsSimulation, request.body())) {
                 LOG.info("Validation failed for request, returning status code:{}", wsSimulation.badRequestResponseCode);
                 response.status(wsSimulation.badRequestResponseCode);

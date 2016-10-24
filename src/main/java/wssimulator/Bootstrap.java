@@ -230,9 +230,6 @@ public class Bootstrap {
         try {
             CommandLine cmd = parser.parse(options, args);
 
-            if (cmd.hasOption("w")) {
-                webApp(options);
-            }
             if (cmd.hasOption("h")) {
                 usage(options);
             }
@@ -262,14 +259,6 @@ public class Bootstrap {
 
     }
 
-    /**
-     * Invokes the launch of the web-application
-     * @param options
-     */
-    private static void webApp(Options options) {
-        WebAppController webAppController = new WebAppController();
-        webAppController.startWebApp();
-    }
 
     /**
      * Prints out an example YAML simulation file to the default console stream

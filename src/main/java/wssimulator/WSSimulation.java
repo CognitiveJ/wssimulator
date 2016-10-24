@@ -262,7 +262,7 @@ public class WSSimulation {
     public int resilienceFailureCode = 500;
 
     /**
-     * Context object for this simulation
+     * Response object for this simulation
      */
     @JsonIgnore
     public final WSSimulationContext wsSimulationContext = new WSSimulationContext();

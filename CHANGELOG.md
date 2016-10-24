@@ -1,3 +1,6 @@
+# 0.2.11 (24/10/2016)
+- Introduced WSSimulatorContext object as the response to a simulation add. 
+
 # 0.2.10 (21/08/2016)
 - Bug fixes
 - Added the ability to retrieve the last request from the route

@@ -218,7 +218,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static spark.Spark.*;
 
@@ -275,9 +274,9 @@ public class WSSimulatorServiceManager {
      * Adds and starts a web service simulator simulation
      *
      * @param simulation the simulation to be added
-     * @return the id of this simulation
+     * @return the WSResponse object of this simulation
      */
-    public int add(@NotNull WSSimulation simulation) {
+    public WSSimulationContext add(@NotNull WSSimulation simulation) {
         WSSimulatorValidation.validate(simulation);
         return setupRoute(simulation);
     }
@@ -287,7 +286,7 @@ public class WSSimulatorServiceManager {
      *
      * @param simulation the simulator simulation to setup.
      */
-    private int setupRoute(@NotNull WSSimulation simulation) {
+    private WSSimulationContext setupRoute(@NotNull WSSimulation simulation) {
         BaseHandler handler = lookupHandler(simulation);
         validSimulations.put(++counter, simulation);
         if (handler.routeCount() == 1) {
@@ -318,7 +317,7 @@ public class WSSimulatorServiceManager {
                     break;
             }
         }
-        return counter;
+        return simulation.wsSimulationContext;
     }
 
     private BaseHandler lookupHandler(@NotNull WSSimulation wsSimulation) {
@@ -376,10 +375,11 @@ public class WSSimulatorServiceManager {
      *
      * @param simulationId the Simulation ID
      * @return the current call count.
+     * @deprecated use {@link WSSimulationContext#callCount()}
      */
     public int calledCounter(int simulationId) {
         WSSimulation wsSimulation = getWSSimulation(simulationId);
-        return wsSimulation.wsSimulationContext.callCount;
+        return wsSimulation.wsSimulationContext.callCount();
     }
 
 
@@ -388,10 +388,11 @@ public class WSSimulatorServiceManager {
      *
      * @param simulationId
      * @return the last request (or null if not yet called)
+     * @deprecated use {@link WSSimulationContext#lastMessage()} ()}
      */
     public String lastRequest(int simulationId) {
         WSSimulation wsSimulation = getWSSimulation(simulationId);
-        return wsSimulation.wsSimulationContext.lastRequest;
+        return wsSimulation.wsSimulationContext.lastMessage();
     }
 
     public int findSimulationIdByPath(@NotNull String path, @NotNull HttpMethod httpMethod) {

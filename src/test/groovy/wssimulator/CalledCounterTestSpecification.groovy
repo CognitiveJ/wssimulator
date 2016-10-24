@@ -220,13 +220,13 @@ class CalledCounterTestSpecification extends Specification {
         int port = TestUtils.randomPort()
         when:
         WSSimulator.setPort(port)
-        int addedSimulationId = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
+        def response = WSSimulator.addSimulation(new File(getClass().getResource("/simple.yml").toURI()))
         then:
         given().port(port).get("/hello").then().assertThat()
                 .statusCode(200).and().body(equalTo("hello world"))
         given().port(port).get("/hello").then().assertThat()
                 .statusCode(200).and().body(equalTo("hello world"))
-        WSSimulator.calledCount(addedSimulationId) == 2;
+        response.callCount() == 2;
         cleanup:
         WSSimulator.shutdown()
     }

@@ -226,19 +226,6 @@ public class WebAppController implements Route {
     private String baseRoute = "/wssimulator";
     private String route = baseRoute + "/:simulation";
 
-    /**
-     * Starts the web application
-     */
-    public void startWebApp() {
-        LOG.info("Starting web application on route against static files in '/web' ");
-        staticFiles.location("/web");
-        Spark.put(baseRoute, this);
-        Spark.patch(route, this);
-        Spark.delete(route, this);
-        Spark.get(baseRoute, this);
-        Spark.get(route, this);
-    }
-
     @Override
     public Object handle(Request request, Response response) throws Exception {
         String simulationId = request.params("simulation");

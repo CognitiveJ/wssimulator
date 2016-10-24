@@ -230,7 +230,6 @@ class RouteFilterSimulationSpecification extends Specification {
         WSSimulator.addSimulation(new File(getClass().getResource("/route/route3.yml").toURI()))
         then:
         LOG.info("Validate the route filter feature:then")
-
         given().port(port)
                 .contentType(ContentType.XML)
                 .body("This is just random test with Action1 contained within it")

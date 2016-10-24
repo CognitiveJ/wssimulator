@@ -206,11 +206,70 @@
 package wssimulator;
 
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Context object that provides a running view of the simulation.
+ */
 public class WSSimulationContext {
+
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
+
+    private int callCount;
+    private String lastMessage;
+    private CountDownLatch countDownLatch;
 
     /**
      * Holds the call count for this simulation
      */
-    public int callCount;
-    public String lastRequest;
+    public void simulationInvoked(String request) {
+        callCount++;
+        lastMessage = request;
+        if (countDownLatch != null)
+            countDownLatch.countDown();
+    }
+
+    /**
+     * The number of timesk this simulation has been called.
+     *
+     * @return the number of times called
+     */
+    public int callCount() {
+        return callCount;
+    }
+
+    /**
+     * Last message to reach the simulation
+     *
+     * @return the last message
+     */
+    public String lastMessage() {
+        return lastMessage;
+    }
+
+    /**
+     * Blocks the current thread until this simulation is called.
+     */
+    public void blockUntilCalled() {
+        blockUntilCalled(Integer.MAX_VALUE, TimeUnit.DAYS);
+    }
+
+
+    /**
+     * Blocks the current thread until this simulation is called.
+     *
+     * @param timeout  the timeout length
+     * @param timeUnit the unit of time to lock for
+     */
+    public void blockUntilCalled(int timeout, TimeUnit timeUnit) {
+        try {
+            countDownLatch = new CountDownLatch(1);
+            countDownLatch.await(timeout, timeUnit);
+            countDownLatch = null;
+        } catch (InterruptedException e) {
+            LOG.error("Interrupted", e);
+        }
+
+    }
 }

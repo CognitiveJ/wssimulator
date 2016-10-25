@@ -273,6 +273,7 @@ class RouteFilterSimulationSpecification extends Specification {
         WSSimulator.addSimulation(new File(getClass().getResource("/route/route2.yml").toURI()))
         WSSimulator.addSimulation(new File(getClass().getResource("/route/route4.yml").toURI()))
         WSSimulator.addSimulation(new File(getClass().getResource("/route/route3.yml").toURI()))
+
         then:
         LOG.info("Validate the route filter feature:then")
         given().port(port)

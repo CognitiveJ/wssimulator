@@ -271,6 +271,7 @@ public abstract class BaseHandler {
         Collections.sort(wsSimulations,
                 (o1, o2) -> Boolean.compare(o2.request.filterType == RouteRequestFilterType.none, o1.request.filterType == RouteRequestFilterType.none));
 
+
         for (WSSimulation simulation : wsSimulations) {
             if (filterTypes.get(simulation.request.filterType).filter(simulation, request))
                 wsSimulation = simulation;

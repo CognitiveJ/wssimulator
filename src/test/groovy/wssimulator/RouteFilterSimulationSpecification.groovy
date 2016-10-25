@@ -225,6 +225,7 @@ class RouteFilterSimulationSpecification extends Specification {
         int port = TestUtils.randomPort()
         WSSimulator.setPort(port)
         when:
+        WSSimulator.addSimulation(new File(getClass().getResource("/route/route4.yml").toURI()))
         WSSimulator.addSimulation(new File(getClass().getResource("/route/route1.yml").toURI()))
         WSSimulator.addSimulation(new File(getClass().getResource("/route/route2.yml").toURI()))
         WSSimulator.addSimulation(new File(getClass().getResource("/route/route3.yml").toURI()))
@@ -249,6 +250,56 @@ class RouteFilterSimulationSpecification extends Specification {
                 .body("This is just random test with Action3 contained within it")
                 .post("/publish").then().assertThat()
                 .statusCode(200).and().body(equalTo("FilteredByAction3"))
+
+        given().port(port)
+                .contentType(ContentType.XML)
+                .body("This is just random test with no action mapped contained within it")
+                .post("/publish").then().assertThat()
+                .statusCode(200).and().body(equalTo("FilteredByAction4"))
+        LOG.info("Validate the route filter feature:end")
+
+        cleanup:
+        LOG.info("Validate the route filter feature:cleanup")
+        WSSimulator.shutdown()
+    }
+
+    def "Validate the route filter feature with different order"() {
+        setup:
+        LOG.info("Validate the route filter feature:setup")
+        int port = TestUtils.randomPort()
+        WSSimulator.setPort(port)
+        when:
+        WSSimulator.addSimulation(new File(getClass().getResource("/route/route1.yml").toURI()))
+        WSSimulator.addSimulation(new File(getClass().getResource("/route/route2.yml").toURI()))
+        WSSimulator.addSimulation(new File(getClass().getResource("/route/route4.yml").toURI()))
+        WSSimulator.addSimulation(new File(getClass().getResource("/route/route3.yml").toURI()))
+        then:
+        LOG.info("Validate the route filter feature:then")
+        given().port(port)
+                .contentType(ContentType.XML)
+                .body("This is just random test with Action1 contained within it")
+                .post("/publish").then().assertThat()
+                .statusCode(200).and().body(equalTo("FilteredByAction1"))
+        LOG.info("Validate the route filter feature:then-1")
+
+        given().port(port)
+                .contentType(ContentType.XML)
+                .body("This is just random test with Action2 contained within it")
+                .post("/publish").then().assertThat()
+                .statusCode(200).and().body(equalTo("FilteredByAction2"))
+        LOG.info("Validate the route filter feature:then-2")
+
+        given().port(port)
+                .contentType(ContentType.XML)
+                .body("This is just random test with Action3 contained within it")
+                .post("/publish").then().assertThat()
+                .statusCode(200).and().body(equalTo("FilteredByAction3"))
+
+        given().port(port)
+                .contentType(ContentType.XML)
+                .body("This is just random test with no action mapped contained within it")
+                .post("/publish").then().assertThat()
+                .statusCode(200).and().body(equalTo("FilteredByAction4"))
         LOG.info("Validate the route filter feature:end")
 
         cleanup:

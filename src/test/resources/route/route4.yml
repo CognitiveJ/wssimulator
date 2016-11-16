@@ -1,0 +1,4 @@
+path: /publish
+httpMethod: post
+response: FilteredByAction4
+

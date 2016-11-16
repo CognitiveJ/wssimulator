@@ -230,8 +230,8 @@ public abstract class BaseHandler {
 
 
     private Map<RouteRequestFilterType, RouteRequestFilterer> filterTypes = new HashMap<RouteRequestFilterType, RouteRequestFilterer>() {{
-        put(RouteRequestFilterType.none, new NoneRouteRequestFilterer());
         put(RouteRequestFilterType.contains, new ContainsRouteRequestFilterer());
+        put(RouteRequestFilterType.none, new NoneRouteRequestFilterer());
     }};
 
     private final List<WSSimulation> wsSimulations = new ArrayList<>();
@@ -265,17 +265,18 @@ public abstract class BaseHandler {
         return "";
     }
 
-
     @Nullable
     private WSSimulation loadSimulation(@Nullable Request request) {
-        if (wsSimulations.size() == 1)
-            return wsSimulations.get(0);
+        WSSimulation wsSimulation = null;
+        Collections.sort(wsSimulations,
+                (o1, o2) -> Boolean.compare(o2.request.filterType == RouteRequestFilterType.none, o1.request.filterType == RouteRequestFilterType.none));
 
-        for (WSSimulation wsSimulation : wsSimulations) {
-            if (filterTypes.get(wsSimulation.request.filterType).filter(wsSimulation, request))
-                return wsSimulation;
+
+        for (WSSimulation simulation : wsSimulations) {
+            if (filterTypes.get(simulation.request.filterType).filter(simulation, request))
+                wsSimulation = simulation;
         }
-        return null;
+        return wsSimulation;
     }
 
     private boolean resilienceCheck(@NotNull WSSimulation wsSimulation) {

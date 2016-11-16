@@ -1,3 +1,6 @@
+# 0.2.12 (15/11/2016)
+- Allowed for all messages to be returned
+ 
 # 0.2.11 (24/10/2016)
 - Introduced WSSimulatorContext object as the response to a simulation add. 
 

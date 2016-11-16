@@ -206,6 +206,8 @@
 package wssimulator;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -216,16 +218,14 @@ public class WSSimulationContext {
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
 
-    private int callCount;
-    private String lastMessage;
+    private List<String> messages = new ArrayList<>();
     private CountDownLatch countDownLatch;
 
     /**
      * Holds the call count for this simulation
      */
     public void simulationInvoked(String request) {
-        callCount++;
-        lastMessage = request;
+        messages.add(request);
         if (countDownLatch != null)
             countDownLatch.countDown();
     }
@@ -236,7 +236,7 @@ public class WSSimulationContext {
      * @return the number of times called
      */
     public int callCount() {
-        return callCount;
+        return messages.size();
     }
 
     /**
@@ -245,7 +245,17 @@ public class WSSimulationContext {
      * @return the last message
      */
     public String lastMessage() {
-        return lastMessage;
+        return messages.size() - 1 >= 0 ? messages.get(messages.size() - 1) : "";
+    }
+
+
+    /**
+     * All received messages to reach the simulation
+     *
+     * @return the last message
+     */
+    public List<String> messages() {
+        return messages;
     }
 
     /**

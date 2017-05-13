@@ -1,11 +1,11 @@
 # WSSimulator
  
-WSSimulator is an open source library that easily allows for you to simulate external web service calls and responses. Useful for when can not interact with external web services but need to still test the interactions. 
+WSSimulator is an open source library that easily allows for you to simulate external public service calls and responses. Useful for when can not interact with external public services but need to still test the interactions. 
  
  **When would you use WSSimulator?**
 
  
- *	For Integration level tests when real web service calls cannot be made (for example, when the producing service does not yet exist, costs prohibit calling services within tests or the service isn’t accessible).
+ *	For Integration level tests when real public service calls cannot be made (for example, when the producing service does not yet exist, costs prohibit calling services within tests or the service isn’t accessible).
  *	When you quickly want to serve up static repeatable content over HTTP.
  *  You need to validate the structure of your outbound requests against a schema that an external service will be expecting.
  *  Validate that your code calling services can handle failure (resilience)
@@ -17,7 +17,7 @@ WSSimulator is an open source library that easily allows for you to simulate ext
 *   The dependency from JCenter or the Standalone [distro](https://github.com/CognitiveJ/wssimulator/releases/download/0.2.12/wssimulator-0.2.12.zip "Download Standalone Version")
 
 
-To simulate web service calls, you first need to describe the simulation. This process is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much to get start as the only required field for you to define is _path_ and WSSimulator will default the other options.
+To simulate public service calls, you first need to describe the simulation. This process is very easy as Simulations are created in a YAML format and you don't need to 'simulate' much to get start as the only required field for you to define is _path_ and WSSimulator will default the other options.
 
 ###### Simple Simulation which shows that you only need to supply a path in order to launch WSSimulator
 ```yaml

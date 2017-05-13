@@ -219,7 +219,12 @@ public class WSSimulationContext {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
 
     private List<String> messages = new ArrayList<>();
+
     private CountDownLatch countDownLatch;
+    /**
+     * identification for this simulation
+     */
+    public int id;
 
     /**
      * Holds the call count for this simulation

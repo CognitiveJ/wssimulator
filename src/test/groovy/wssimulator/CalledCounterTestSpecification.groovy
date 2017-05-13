@@ -226,7 +226,7 @@ class CalledCounterTestSpecification extends Specification {
                 .statusCode(200).and().body(equalTo("hello world"))
         given().port(port).get("/hello").then().assertThat()
                 .statusCode(200).and().body(equalTo("hello world"))
-        response.callCount() == 2;
+        response.callCount() == 2
         cleanup:
         WSSimulator.shutdown()
     }

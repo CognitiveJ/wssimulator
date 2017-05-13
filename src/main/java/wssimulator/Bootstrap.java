@@ -208,6 +208,8 @@ package wssimulator;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -222,6 +224,8 @@ import java.util.List;
  * Main class for launching wssimulator in standalone mode.
  */
 public class Bootstrap {
+
+    public static final int DEFAULT_MONITOR_HTTP_PORT = 1912;
 
     public static void main(String[] args) {
         Options options = setupOptions();
@@ -258,8 +262,9 @@ public class Bootstrap {
         }
 
     }
-
-
+    
+    
+    
     /**
      * Prints out an example YAML simulation file to the default console stream
      */
@@ -288,8 +293,8 @@ public class Bootstrap {
     private static void loadFileOrScan(String fileOrDirectory) {
         File fileOrDirectoryAsFile = new File(fileOrDirectory);
         if (fileOrDirectoryAsFile.exists() && fileOrDirectoryAsFile.isDirectory()) {
-            Collection<File> files = FileUtils.listFiles(new File(fileOrDirectory), new String[]{"yaml"}, false);
-            WSSimulator.addSimulations(files);
+            Collection<File> files = FileUtils.listFiles(new File(fileOrDirectory), new String[]{"yml"}, false);
+//            WSSimulator.addSimulations(files);
         } else if (fileOrDirectoryAsFile.exists()) {
             WSSimulator.addSimulation(fileOrDirectoryAsFile);
         } else {
@@ -306,11 +311,13 @@ public class Bootstrap {
     private static Options setupOptions() {
         Options options = new Options();
         Option help = new Option("h", "print this message");
-        Option web = new Option("w", "Starts the web application");
+        Option webMonitor = new Option("m", "Starts the monitor application (started by default)");
+        Option webMonitorPort = new Option("mp", "starts the monitor on the passed port (default is xx)");
         Option port = new Option("p", true, "Set the HTTP Port to start the server on (1 to 65535)");
         Option fileOrDirectory = new Option("y", true, "Reference to a single yaml simulation file or a directory which will load all *.yml files within the target directory");
         Option sampleYamlFile = new Option("s", false, "Print out an sample YAML Simulation file");
-        options.addOption(web);
+        options.addOption(webMonitor);
+        options.addOption(webMonitorPort);
         options.addOption(help);
         options.addOption(port);
         options.addOption(fileOrDirectory);

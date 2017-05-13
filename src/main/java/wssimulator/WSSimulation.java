@@ -209,6 +209,9 @@ package wssimulator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents a full simulation for the wssimulator service
  */
@@ -271,4 +274,5 @@ public class WSSimulation {
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
+
 }

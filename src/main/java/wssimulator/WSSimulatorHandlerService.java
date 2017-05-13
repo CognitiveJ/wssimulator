@@ -205,64 +205,215 @@
 
 package wssimulator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.apache.commons.io.FileUtils;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spark.Service;
+import wssimulator.handler.BaseHandler;
+import wssimulator.handler.GenericHandler;
+import wssimulator.handler.JSONHandler;
+import wssimulator.handler.XMLHandler;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Converts valid YAML to a simulation.
+ * Manages the service raise
  */
-public class YamlToSimulation {
-    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(YamlToSimulation.class);
-    private File yamlFile;
-    private String yamlString;
+public class WSSimulatorHandlerService {
+    private int counter = 0;
+    private Map<String, BaseHandler> handlers = new HashMap<>();
+    private Map<Integer, WSSimulation> validSimulations = new HashMap<>();
 
-    public YamlToSimulation(@NotNull File yamlFile) {
-        this.yamlFile = yamlFile;
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulatorHandlerService.class);
+    private int port = 9543;
+    private Service simulationServer;
+
+    private WSSimulatorHandlerService() {
     }
 
-    public YamlToSimulation(@NotNull String yamlString) {
-        this.yamlString = yamlString;
+
+    public Map<Integer, WSSimulation> validSimulations() {
+        return validSimulations;
     }
 
+    public void port(int port) {
+        this.port = port;
+    }
+
+    private void igniteServer() {
+        LOG.info("igniteServer for port {}", port);
+        simulationServer = Service.ignite()
+                .port(port).threadPool(10);
+    }
+
+    /**
+     * Initializes singleton.
+     */
+    private static class SingletonHolder {
+        private static final WSSimulatorHandlerService INSTANCE = startup();
+    }
+
+    /**
+     * Returns the instance for this singleton
+     *
+     * @return the instance
+     */
     @NotNull
-    public WSSimulation simulatorSimulation() {
-        if (yamlFile != null)
-            try {
-                yamlString = FileUtils.readFileToString(yamlFile, Charset.defaultCharset());
-            } catch (IOException e) {
-                LOG.error(String.format("Could not read yaml file:(%s)", yamlFile), e);
-                throw new YamlNotValidException("Cannot read file");
-            }
-        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        WSSimulation simulation;
-        try {
-            simulation = mapper.readValue(yamlString, WSSimulation.class);
-        } catch (Exception e) {
-            LOG.error(String.format("Could not parse yaml file:(%s)", yamlFile), e);
-            throw new YamlNotValidException(String.format("Could not parse yaml file:(%s)", yamlFile));
-        }
-        return simulation;
-
+    public static WSSimulatorHandlerService getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
 
-    @Nullable
-    public static WSSimulation toSimulation(@NotNull String yamlString) {
-        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        WSSimulation simulation = null;
-        try {
-            simulation = mapper.readValue(yamlString, WSSimulation.class);
-        } catch (Exception e) {
-            LOG.info(String.format("Could not parse yaml:(%s)", yamlString), e);
+    /**
+     * Set the singleton for this manager.
+     *
+     * @return the created singleton
+     */
+    @NotNull
+    private static WSSimulatorHandlerService startup() {
+        return new WSSimulatorHandlerService();
+    }
+
+
+    /**
+     * Adds and starts a simulator simulation
+     *
+     * @param simulation the simulation to be added
+     * @return the WSResponse object of this simulation
+     */
+    public WSSimulationContext add(@NotNull WSSimulation simulation) {
+        WSSimulatorValidation.validate(simulation);
+        return setupRoute(simulation);
+    }
+
+
+    /**
+     * Sets up a new route within spark.
+     *
+     * @param simulation the simulator simulation to setup.
+     */
+    private WSSimulationContext setupRoute(@NotNull WSSimulation simulation) {
+        if (simulationServer == null)
+            igniteServer();
+        BaseHandler handler = lookupHandler(simulation);
+        validSimulations.put(++counter, simulation);
+        simulation.wsSimulationContext.id = counter;
+        if (handler.routeCount() == 1) {
+            switch (simulation.httpMethod) {
+                case get:
+                    simulationServer.get(simulation.path, handler::processRequest);
+                    LOG.info("GET {} now listening", simulation.path);
+                    break;
+                case post:
+                    simulationServer.post(simulation.path, handler::processRequest);
+                    LOG.info("POST {} now listening", simulation.path);
+                    break;
+                case put:
+                    simulationServer.put(simulation.path, handler::processRequest);
+                    LOG.info("PUT {} now listening", simulation.path);
+                    break;
+                case patch:
+                    simulationServer.patch(simulation.path, handler::processRequest);
+                    LOG.info("PATCH {} now listening", simulation.path);
+                    break;
+                case delete:
+                    simulationServer.delete(simulation.path, handler::processRequest);
+                    LOG.info("DELETE {} now listening", simulation.path);
+                    break;
+                case head:
+                    simulationServer.head(simulation.path, handler::processRequest);
+                    LOG.info("HEAD {} now listening", simulation.path);
+                    break;
+            }
         }
-        return simulation;
+        return simulation.wsSimulationContext;
+    }
+
+    private BaseHandler lookupHandler(@NotNull WSSimulation wsSimulation) {
+        BaseHandler baseHandler = handlers.get(wsSimulation.path + "::" + wsSimulation.httpMethod);
+        if (baseHandler == null) {
+            if ("application/xml".equals(wsSimulation.consumes))
+                baseHandler = new XMLHandler(wsSimulation);
+            else if ("application/json".equals(wsSimulation.consumes))
+                baseHandler = new JSONHandler(wsSimulation);
+            else
+                baseHandler = new GenericHandler(wsSimulation);
+            handlers.put(wsSimulation.path + "::" + wsSimulation.httpMethod, baseHandler);
+        } else {
+            baseHandler.addRoute(wsSimulation);
+        }
+        return baseHandler;
+    }
+
+    /**
+     * Shuts down the simulator.
+     */
+    public void shutdown() {
+        simulationServer.stop();
+        simulationServer = null;
+        validSimulations.clear();
+        handlers.clear();
+        counter = 0;
+    }
+
+    /**
+     * Returns the valid simulation count.
+     *
+     * @return the number of valid specifications.
+     */
+    public int validSimulationCount() {
+        return validSimulations.size();
+    }
+
+
+    /**
+     * returns a simulation if available (by simulation id).
+     *
+     * @param simulationId The id of the simulation.
+     * @return the wssimulation or null if not found.
+     */
+    @Nullable
+    public WSSimulation getWSSimulation(int simulationId) {
+        WSSimulation wsSimulation = validSimulations.get(simulationId);
+        if (wsSimulation == null)
+            throw new SimulationNotFoundException(simulationId);
+        return wsSimulation;
+    }
+
+    /**
+     * The current call count for a simulation
+     *
+     * @param simulationId the Simulation ID
+     * @return the current call count.
+     * @deprecated use {@link WSSimulationContext#callCount()}
+     */
+    public int calledCounter(int simulationId) {
+        WSSimulation wsSimulation = getWSSimulation(simulationId);
+        return wsSimulation.wsSimulationContext.callCount();
+    }
+
+
+    /**
+     * Last request received for an endpoint
+     *
+     * @param simulationId
+     * @return the last request (or null if not yet called)
+     * @deprecated use {@link WSSimulationContext#lastMessage()} ()}
+     */
+    public String lastRequest(int simulationId) {
+        WSSimulation wsSimulation = getWSSimulation(simulationId);
+        return wsSimulation.wsSimulationContext.lastMessage();
+    }
+
+    public int findSimulationIdByPath(@NotNull String path, @NotNull HttpMethod httpMethod) {
+        return validSimulations.entrySet()
+                .stream()
+                .filter(e -> e.getValue().path.equalsIgnoreCase(path) && e.getValue().httpMethod.equals(httpMethod))
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElse(-1);
     }
 }

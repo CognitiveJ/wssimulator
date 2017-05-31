@@ -1,2 +1,0 @@
-path: /hello/:name
-response: Hello World ${param.name}

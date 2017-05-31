@@ -206,7 +206,6 @@
 package wssimulator;
 
 /**
- *
  * The Route Filter options
  */
 public enum RouteRequestFilterType {

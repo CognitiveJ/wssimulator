@@ -230,14 +230,39 @@ public class WSSimulation {
     public String path;
 
     /**
+     * The namespace of this simulation
+     */
+    public String namespace = "";
+
+    /**
      * Mediatype the service will consume.
      */
     public String consumes = "text/plain";
 
     /**
+     * An name to represent this call
+     */
+    public String name="";
+
+    /**
+     * Added latency for this call in milliseconds; supports ranged latency; e.g. (100-500)
+     */
+    public String latency="0";
+
+    /**
+     * sets the response code to send back to the caller
+     */
+    public int responseCode = 200;
+
+    /**
      * Default Response
      */
-    public String response;
+    public String response="";
+
+    /**
+     * Priority giving to this simulation.
+     */
+    public int priority = Integer.MAX_VALUE;
 
 
     /**
@@ -246,29 +271,12 @@ public class WSSimulation {
     public WSSimulatorRequest request = new WSSimulatorRequest();
 
     /**
-     * sets the successful response code to send back to the server
-     */
-    public int successResponseCode = 201;
-
-    /**
-     * sets the response code when the data is not valid;
-     */
-    public int badRequestResponseCode = 400;
-
-    /**
-     * Resilience of this server (0 to 1); 1 meaning it never fails and 0 meaning it always will fail.
-     */
-    public double resilience = 1;
-    /**
-     * failure code to pass back to the client when the server fails
-     */
-    public int resilienceFailureCode = 500;
-
-    /**
      * Response object for this simulation
      */
     @JsonIgnore
     public final WSSimulationContext wsSimulationContext = new WSSimulationContext();
+    @JsonIgnore
+    public String onClassPath;
 
     @Override
     public String toString() {

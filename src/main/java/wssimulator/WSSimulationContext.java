@@ -227,7 +227,9 @@ public class WSSimulationContext {
     public int id;
 
     /**
-     * Holds the call count for this simulation
+     * Holds the request just received for this simulation
+     *
+     * @param request - the request
      */
     public void simulationInvoked(String request) {
         messages.add(request);

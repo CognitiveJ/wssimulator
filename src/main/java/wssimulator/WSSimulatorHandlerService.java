@@ -210,14 +210,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spark.Service;
 import wssimulator.handler.BaseHandler;
-import wssimulator.handler.GenericHandler;
-import wssimulator.handler.JSONHandler;
-import wssimulator.handler.XMLHandler;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Manages the service raise
@@ -228,55 +225,21 @@ public class WSSimulatorHandlerService {
     private Map<Integer, WSSimulation> validSimulations = new HashMap<>();
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulatorHandlerService.class);
-    private int port = 9543;
-    private Service simulationServer;
+    private int assignedPort = 0;
+    private Map<Integer, Service> simulationServers = new HashMap<>();
 
-    private WSSimulatorHandlerService() {
+
+    void assignedPort(int port) {
+        this.assignedPort = port;
+        simulationServers.put(port, igniteService(port, 10));
+
     }
 
-
-    public Map<Integer, WSSimulation> validSimulations() {
-        return validSimulations;
-    }
-
-    public void port(int port) {
-        this.port = port;
-    }
-
-    private void igniteServer() {
-        LOG.info("igniteServer for port {}", port);
-        simulationServer = Service.ignite()
-                .port(port).threadPool(10);
-    }
-
-    /**
-     * Initializes singleton.
-     */
-    private static class SingletonHolder {
-        private static final WSSimulatorHandlerService INSTANCE = startup();
-    }
-
-    /**
-     * Returns the instance for this singleton
-     *
-     * @return the instance
-     */
     @NotNull
-    public static WSSimulatorHandlerService getInstance() {
-        return SingletonHolder.INSTANCE;
+    private Service igniteService(int port, int threads) {
+        return Service.ignite()
+                .port(port).threadPool(threads);
     }
-
-
-    /**
-     * Set the singleton for this manager.
-     *
-     * @return the created singleton
-     */
-    @NotNull
-    private static WSSimulatorHandlerService startup() {
-        return new WSSimulatorHandlerService();
-    }
-
 
     /**
      * Adds and starts a simulator simulation
@@ -296,8 +259,7 @@ public class WSSimulatorHandlerService {
      * @param simulation the simulator simulation to setup.
      */
     private WSSimulationContext setupRoute(@NotNull WSSimulation simulation) {
-        if (simulationServer == null)
-            igniteServer();
+        Service simulationServer = simulationServers.get(assignedPort);
         BaseHandler handler = lookupHandler(simulation);
         validSimulations.put(++counter, simulation);
         simulation.wsSimulationContext.id = counter;
@@ -333,27 +295,18 @@ public class WSSimulatorHandlerService {
     }
 
     private BaseHandler lookupHandler(@NotNull WSSimulation wsSimulation) {
-        BaseHandler baseHandler = handlers.get(wsSimulation.path + "::" + wsSimulation.httpMethod);
-        if (baseHandler == null) {
-            if ("application/xml".equals(wsSimulation.consumes))
-                baseHandler = new XMLHandler(wsSimulation);
-            else if ("application/json".equals(wsSimulation.consumes))
-                baseHandler = new JSONHandler(wsSimulation);
-            else
-                baseHandler = new GenericHandler(wsSimulation);
-            handlers.put(wsSimulation.path + "::" + wsSimulation.httpMethod, baseHandler);
-        } else {
-            baseHandler.addRoute(wsSimulation);
-        }
+        BaseHandler baseHandler;
+        baseHandler = handlers.computeIfAbsent(wsSimulation.path + "::" + wsSimulation.httpMethod, s -> new BaseHandler());
+        baseHandler.addRoute(wsSimulation);
         return baseHandler;
     }
 
     /**
      * Shuts down the simulator.
      */
-    public void shutdown() {
-        simulationServer.stop();
-        simulationServer = null;
+    void shutdownAll() {
+        simulationServers.forEach((integer, service) -> service.stop());
+        simulationServers.clear();
         validSimulations.clear();
         handlers.clear();
         counter = 0;
@@ -364,7 +317,7 @@ public class WSSimulatorHandlerService {
      *
      * @return the number of valid specifications.
      */
-    public int validSimulationCount() {
+    int validSimulationCount() {
         return validSimulations.size();
     }
 
@@ -376,36 +329,11 @@ public class WSSimulatorHandlerService {
      * @return the wssimulation or null if not found.
      */
     @Nullable
-    public WSSimulation getWSSimulation(int simulationId) {
+    WSSimulation getWSSimulation(int simulationId) {
         WSSimulation wsSimulation = validSimulations.get(simulationId);
         if (wsSimulation == null)
             throw new SimulationNotFoundException(simulationId);
         return wsSimulation;
-    }
-
-    /**
-     * The current call count for a simulation
-     *
-     * @param simulationId the Simulation ID
-     * @return the current call count.
-     * @deprecated use {@link WSSimulationContext#callCount()}
-     */
-    public int calledCounter(int simulationId) {
-        WSSimulation wsSimulation = getWSSimulation(simulationId);
-        return wsSimulation.wsSimulationContext.callCount();
-    }
-
-
-    /**
-     * Last request received for an endpoint
-     *
-     * @param simulationId
-     * @return the last request (or null if not yet called)
-     * @deprecated use {@link WSSimulationContext#lastMessage()} ()}
-     */
-    public String lastRequest(int simulationId) {
-        WSSimulation wsSimulation = getWSSimulation(simulationId);
-        return wsSimulation.wsSimulationContext.lastMessage();
     }
 
     public int findSimulationIdByPath(@NotNull String path, @NotNull HttpMethod httpMethod) {
@@ -415,5 +343,30 @@ public class WSSimulatorHandlerService {
                 .findFirst()
                 .map(Map.Entry::getKey)
                 .orElse(-1);
+    }
+
+    @NotNull
+    Collection<WSSimulation> findSimulationsNamespace(@NotNull String namespace) {
+        return validSimulations
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue().namespace.startsWith(namespace))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+
+    }
+
+    @NotNull
+    public Map<Integer, WSSimulation> validSimulations() {
+        return validSimulations;
+    }
+
+    public WSSimulation findSimulationByName(@NotNull String name) {
+        return getWSSimulation(validSimulations.entrySet()
+                .stream()
+                .filter(e -> name.equalsIgnoreCase(e.getValue().name))
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElse(-1));
     }
 }

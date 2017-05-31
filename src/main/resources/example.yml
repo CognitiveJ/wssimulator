@@ -1,16 +1,36 @@
 path: /payment
-request: action: allocate
-consumes: application/xml
 httpMethod: post
-response: I expect this as the response
-requestStructure: <?xml version="1.0" encoding="UTF-8"?>
-                   <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-                              xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                       <xs:element name="custome" type="customeType"/>
-                       <xs:complexType name="customeType">
-                           <xs:sequence>
-                               <xs:element type="xs:string" name="name"/>
-                               <xs:element type="xs:string" name="address"/>
-                           </xs:sequence>
-                       </xs:complexType>
-                   </xs:schema>
+port: 9090
+consumes: application/json
+namespace: hello.world.test
+calls:
+      -call:
+            id: response-good-1
+            tags: success, 201
+            request:
+                      filterType: contains
+                      filter: Action3
+                      requestStructure: <?xml version="1.0" encoding="UTF-8"?>
+                                                     <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+                                                                xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                                                         <xs:element name="custome" type="customeType"/>
+                                                         <xs:complexType name="customeType">
+                                                             <xs:sequence>
+                                                                 <xs:element type="xs:string" name="name"/>
+                                                                 <xs:element type="xs:string" name="address"/>
+                                                             </xs:sequence>
+                                                         </xs:complexType>
+                                                     </xs:schema>
+            response: I expect this as the response
+            reponseCode: 201
+            latency: 100-500
+      -call:
+            id: response-bad-1
+            tags: failure, 404
+            enabled: false
+            condition:
+                      filterType: contains
+                      filter: failure
+            response:
+            reponse-code: 404
+            latency: 100

@@ -231,5 +231,10 @@ public final class SimulationFilters {
         return new FilterByPath(pathFilter);
     }
 
+    @NotNull
+    public static FilterByNamespace byNamespace(@NotNull String namespaceFilter) {
+        return new FilterByNamespace(namespaceFilter);
+    }
+
 
 }

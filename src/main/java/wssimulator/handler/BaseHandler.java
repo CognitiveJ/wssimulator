@@ -205,7 +205,11 @@
 
 package wssimulator.handler;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -214,7 +218,10 @@ import spark.Response;
 import wssimulator.RouteRequestFilterType;
 import wssimulator.WSSimulation;
 import wssimulator.WSSimulator;
+import wssimulator.scanner.SimulationScanner;
 
+import java.io.File;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -224,7 +231,7 @@ import java.util.stream.Collectors;
  * This base class has a common features and delegates to specialised classes
  * based on the 'consumes' data element.
  */
-public abstract class BaseHandler {
+public class BaseHandler {
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
 
@@ -236,6 +243,10 @@ public abstract class BaseHandler {
 
     private final List<WSSimulation> wsSimulations = new ArrayList<>();
     private final Random random = new Random();
+
+    public BaseHandler() {
+
+    }
 
     public BaseHandler(@NotNull WSSimulation wsSimulations) {
         this.wsSimulations.add(wsSimulations);
@@ -249,20 +260,26 @@ public abstract class BaseHandler {
         WSSimulation wsSimulation = loadSimulation(request);
         if (wsSimulation != null) {
             wsSimulation.wsSimulationContext.simulationInvoked(request.body());
-            if (!validate(wsSimulation, request.body())) {
-                LOG.info("Validation failed for request, returning status code:{}", wsSimulation.badRequestResponseCode);
-                response.status(wsSimulation.badRequestResponseCode);
-                return "";
-            }
-            if (resilienceCheck(wsSimulation)) {
-                LOG.info("Resilience Failed, returning status code:{}", wsSimulation.resilienceFailureCode);
-                response.status(wsSimulation.resilienceFailureCode);
-                return "";
-            }
+            latencyCheck(wsSimulation);
+
+            LOG.info("returning with status code:{}", wsSimulation.responseCode);
+            response.status(wsSimulation.responseCode);
             if (StringUtils.isNotEmpty(wsSimulation.response))
-                return new StrSubstitutor(params).replace(wsSimulation.response);
+                return new StrSubstitutor(params).replace(loadResponse(wsSimulation));
         }
         return "";
+    }
+
+    private String loadResponse(WSSimulation simulation) {
+        if (!StringUtils.startsWith(simulation.response, "wssimulatorRequest:"))
+            return simulation.response;
+        String requestFile = StringUtils.substringAfter(simulation.response, "wssimulatorRequest:");
+        String content = SimulationScanner.readClasspathResourceQuietly(requestFile);
+        if (StringUtils.isEmpty(content)) {
+            String classpath = FilenameUtils.getFullPathNoEndSeparator(simulation.onClassPath);
+            content = SimulationScanner.readClasspathResourceQuietly(classpath + "/" + requestFile);
+        }
+        return content;
     }
 
     @Nullable
@@ -270,21 +287,37 @@ public abstract class BaseHandler {
         WSSimulation wsSimulation = null;
         Collections.sort(wsSimulations,
                 (o1, o2) -> Boolean.compare(o2.request.filterType == RouteRequestFilterType.none, o1.request.filterType == RouteRequestFilterType.none));
-
-
+        List<WSSimulation> canidates = new ArrayList<>();
         for (WSSimulation simulation : wsSimulations) {
             if (filterTypes.get(simulation.request.filterType).filter(simulation, request))
-                wsSimulation = simulation;
+                canidates.add(simulation);
         }
-        return wsSimulation;
+
+        Optional<WSSimulation> first = canidates.stream().sorted(Comparator.comparingInt(o -> o.priority)).findFirst();
+        return first.orElse(null);
     }
 
-    private boolean resilienceCheck(@NotNull WSSimulation wsSimulation) {
-        return wsSimulation.resilience < 1 && wsSimulation.resilience - random.nextDouble() <= 0;
+
+    private void latencyCheck(@NotNull WSSimulation wsSimulation) {
+        if (StringUtils.isNotEmpty(wsSimulation.latency)) {
+            if (StringUtils.contains(wsSimulation.latency, "-")) {
+                //do the range stuff
+                long start = NumberUtils.toLong(StringUtils.substringBefore(wsSimulation.latency, "-"), 0);
+                long end = NumberUtils.toLong(StringUtils.substringAfter(wsSimulation.latency, "-"), 0);
+                long delay = RandomUtils.nextLong(start, end);
+                sleepFor(delay);
+            }
+            sleepFor(NumberUtils.toLong(wsSimulation.latency, 0));
+        }
     }
 
-    protected abstract boolean validate(@NotNull WSSimulation WSSimulation,
-                                        @Nullable String body);
+
+    private void sleepFor(long sleepFor) {
+        try {
+            Thread.sleep(sleepFor);
+        } catch (InterruptedException ignored) {
+        }
+    }
 
     private Map<String, String> buildParameterValues(@NotNull Request request) {
         Map<String, String> params = request
@@ -299,7 +332,7 @@ public abstract class BaseHandler {
     /**
      * Return the route count that this handler manages
      *
-     * @return
+     * @return the number of routes
      */
     public int routeCount() {
         return wsSimulations.size();

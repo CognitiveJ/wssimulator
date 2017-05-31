@@ -1,0 +1,4 @@
+path: /priority
+namespace: test.priority
+response: pr2
+priority: 3

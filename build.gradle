@@ -10,7 +10,6 @@ plugins {
 
 apply plugin: 'maven-publish'
 apply plugin: 'groovy'
-apply plugin: 'application'
 
 
 apply from: file('publish.gradle')
@@ -24,7 +23,7 @@ sourceCompatibility = 1.8
 
 
 dependencies {
-    compile "com.sparkjava:spark-core:2.5"
+    compile "com.sparkjava:spark-core:2.6.0.RC0"
     compile "commons-io:commons-io:2.5"
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.8.8"
     compile "com.fasterxml.jackson.core:jackson-annotations:2.8.8"
@@ -45,8 +44,6 @@ dependencies {
     
 
 }
-
-mainClassName = "wssimulator.Bootstrap"
 
 jar {
     from rootProject.file('LICENSE')

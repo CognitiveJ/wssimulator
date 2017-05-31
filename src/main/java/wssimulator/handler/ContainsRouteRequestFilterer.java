@@ -207,6 +207,7 @@ package wssimulator.handler;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spark.Request;
 import wssimulator.WSSimulation;
 
@@ -216,7 +217,7 @@ import wssimulator.WSSimulation;
  */
 public class ContainsRouteRequestFilterer implements RouteRequestFilterer {
     @Override
-    public boolean filter(@NotNull WSSimulation wsSimulation, @NotNull Request request) {
-        return StringUtils.isNotEmpty(request.body()) && request.body().contains(wsSimulation.request.filter);
+    public boolean filter(@NotNull WSSimulation simulation, @Nullable Request request) {
+        return StringUtils.isNotEmpty(request.body()) && request.body().contains(simulation.request.filter);
     }
 }

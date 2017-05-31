@@ -1,4 +1,0 @@
-path: /hello
-response: hello world
-resilience: 0
-resilienceFailureCode: 501

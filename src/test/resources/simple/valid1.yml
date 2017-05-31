@@ -1,2 +1,3 @@
 path: /hello
 response: hello world
+namespace: test.simple

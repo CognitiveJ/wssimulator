@@ -206,13 +206,12 @@
 package wssimulator.handler;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spark.Request;
 import wssimulator.WSSimulation;
 
-/**
- *
- */
+
 public interface RouteRequestFilterer {
 
-    boolean filter(@NotNull WSSimulation wsSimulation, @NotNull Request request);
+    boolean filter(@NotNull WSSimulation simulation, @Nullable Request request);
 }

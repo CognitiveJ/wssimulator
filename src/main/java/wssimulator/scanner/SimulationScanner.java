@@ -206,20 +206,15 @@
 package wssimulator.scanner;
 
 
-import com.google.common.base.Predicates;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import wssimulator.WSSimulation;
 import wssimulator.YamlToSimulation;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.Predicate;
@@ -236,47 +231,35 @@ public class SimulationScanner {
                 new Reflections(packagePrefixFilter(searchFilters), new ResourcesScanner());
         Set<String> candidateClasspathLocations =
                 reflections.getResources(Pattern.compile(regexFilter(searchFilters)));
-        return filterSimulationsByContent(classpathToSimulations(candidateClasspathLocations), simulationFilter);
+        List<WSSimulation> candidateSimulations = classpathToSimulations(candidateClasspathLocations);
+        return filterSimulationsByContent(candidateSimulations, simulationFilter);
     }
 
     @NotNull
-    public static Collection<WSSimulation> fileSystemScanner(@NotNull SimulationFilter simulationFilter) {
-        List<SearchFilter> searchFilters = searchFilters(simulationFilter);
-
-
-        File[] dirs = new File(StringUtils.isEmpty(packagePrefixFilter(searchFilters)) ? "." : packagePrefixFilter(searchFilters))
-                .listFiles((FilenameFilter) new RegexFileFilter(regexFilter(searchFilters)));
-
-        return filterSimulationsByContent(filesToSimulations(Arrays.asList(dirs)), simulationFilter);
+    public static Collection<WSSimulation> fromClasspath(@NotNull String... locations) {
+        //todo - simply load from the package structure
+        return Collections.emptyList();
     }
 
     private static Collection<WSSimulation> filterSimulationsByContent(List<WSSimulation> candidateSimulations, SimulationFilter simulationFilter) {
-        ContentFilterPredicate contentFilterPredicate = new ContentFilterPredicate(simuationConentFilters(simulationFilter));
+        ContentFilterPredicate contentFilterPredicate = new ContentFilterPredicate(simulationContentFilters(simulationFilter));
         return candidateSimulations.stream().filter(contentFilterPredicate).collect(Collectors.toList());
     }
 
     private static List<WSSimulation> classpathToSimulations(Collection<String> candidateClasspathList) {
-        return candidateClasspathList.stream()
-                .map(SimulationScanner::readClasspathResourceQuietly)
-                .map(YamlToSimulation::toSimulation).collect(Collectors.toList());
+        List<WSSimulation> list = new ArrayList<>();
+        for (String classPath : candidateClasspathList) {
+            String readClasspathResourceQuietly = readClasspathResourceQuietly(classPath);
+            if (readClasspathResourceQuietly.contains("path:")) {
+                WSSimulation wsSimulation = YamlToSimulation.toSimulation(classPath, readClasspathResourceQuietly);
+                if (wsSimulation != null) {
+                    list.add(wsSimulation);
+                }
+            }
+        }
+        return list;
     }
 
-
-    private static List<WSSimulation> filesToSimulations(Collection<File> candidateFileList) {
-        return candidateFileList.stream()
-                .map(SimulationScanner::readFileSystemResourceQuietly)
-                .map(YamlToSimulation::toSimulation).collect(Collectors.toList());
-    }
-
-
-    @NotNull
-    private Collection<WSSimulation> filterCandidates(@NotNull Set<File> candidates) {
-        final List<String> filteredCandidates = candidates
-                .stream().map(this::readFileToStringQuietly).filter(s -> s.contains("path:")).collect(Collectors.toList());
-        return filteredCandidates.stream()
-                .map(YamlToSimulation::toSimulation)
-                .collect(Collectors.toList());
-    }
 
     @NotNull
     private static String regexFilter(@NotNull List<SearchFilter> searchFilters) {
@@ -304,7 +287,7 @@ public class SimulationScanner {
     }
 
     @NotNull
-    private static List<SimulationContentFilter> simuationConentFilters(@NotNull SimulationFilter filter) {
+    private static List<SimulationContentFilter> simulationContentFilters(@NotNull SimulationFilter filter) {
         if (filter instanceof CompositeFilter)
             return ((CompositeFilter) filter).simulationContentFilters();
         if (filter instanceof SimulationContentFilter)
@@ -312,31 +295,13 @@ public class SimulationScanner {
         return new ArrayList<>();
     }
 
-    @NotNull
-    private String readFileToStringQuietly(@NotNull File file) {
-        StringBuilder stringBuilder = new StringBuilder();
+    public static String readClasspathResourceQuietly(String packageLocation) {
         try {
-            stringBuilder.append(FileUtils.readFileToString(file, Charset.defaultCharset()));
-        } catch (IOException ignored) {
-        }
-        return stringBuilder.toString();
-    }
-
-    private static String readClasspathResourceQuietly(String packageLocation) {
-        try {
-            return IOUtils.toString(SimulationScanner.class.getClassLoader()
-                    .getResourceAsStream(packageLocation), Charset.defaultCharset());
+            InputStream resourceAsStream = SimulationScanner.class.getClassLoader()
+                    .getResourceAsStream(packageLocation);
+            return resourceAsStream == null ? "" : IOUtils.toString(resourceAsStream, Charset.defaultCharset());
         } catch (IOException e) {
             LOG.info("Couldn't read file {}", packageLocation);
-        }
-        return "";
-    }
-
-    private static String readFileSystemResourceQuietly(File fileToRead) {
-        try {
-            return FileUtils.readFileToString(fileToRead, Charset.defaultCharset());
-        } catch (IOException e) {
-            LOG.info("Couldn't read file {}", fileToRead);
         }
         return "";
     }

@@ -216,127 +216,18 @@ import java.util.Collection;
  */
 public final class WSSimulator {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
-    private static WSSimulatorHandlerService wsSimulatorHandlerService = WSSimulatorHandlerService.getInstance();
 
-    
-    
-    public static void addSimulations()
-    {
-        
-    }
-    /**
-     * Apply a simulation to be emulated
-     *
-     * @param yamlString YAML as a String
-     */
-    public static void addSimulation(@NotNull String yamlString) {
-        LOG.info("adding simulation string: {}", yamlString);
-        YamlToSimulation yamlToSimulation = new YamlToSimulation(yamlString);
-        wsSimulatorHandlerService.add(yamlToSimulation.simulatorSimulation());
+    public static Simulator simulator(int onPort) {
+        LOG.info("creating simulator on assignedPort:{}", onPort);
+        Simulator simulator = new Simulator();
+        simulator.setPort(onPort);
+        return simulator;
     }
 
-
-    /**
-     * Apply a simulation to be emulated
-     *
-     * @param classpathLocation YAML location on classpath
-     */
-    public static void addSimulationOnClasspath(@NotNull String classpathLocation) {
-        LOG.info("adding simulation on classpath: {}", classpathLocation);
-        YamlToSimulation yamlToSimulation = new YamlToSimulation(new File(WSSimulator.class.getResource(classpathLocation).getFile()));
-        wsSimulatorHandlerService.add(yamlToSimulation.simulatorSimulation());
+    public static Simulator simulator() {
+        LOG.info("creating simulator");
+        return new Simulator();
     }
 
-    /**
-     * Apply a simulation to be emulated
-     *
-     * @param WSSimulation the WSSimulation
-     * @return the WSSimulationContext of this simulation
-     */
-    public static WSSimulationContext addSimulation(@NotNull WSSimulation WSSimulation) {
-        return wsSimulatorHandlerService.add(WSSimulation);
-    }
-
-
-    /**
-     * Adds a simulation from a YAML file
-     *
-     * @param echoSimulationAsYaml the yaml file
-     * @return the WSSimulationContext of this simulation
-     */
-    public static WSSimulationContext addSimulation(@NotNull File echoSimulationAsYaml) {
-        LOG.info("adding simulation file: {}", echoSimulationAsYaml);
-        YamlToSimulation yamlToSimulation = new YamlToSimulation(echoSimulationAsYaml);
-        return addSimulation(yamlToSimulation.simulatorSimulation());
-    }
-
-    /**
-     * Shuts down the simulator
-     */
-    public static void shutdown() {
-        LOG.info("Shutting down server");
-        wsSimulatorHandlerService.shutdown();
-    }
-
-    /**
-     * Sets the port to start the http server.
-     *
-     * @param port the port number
-     */
-    public static void setPort(int port) {
-        LOG.info("setting port to {}", port);
-        wsSimulatorHandlerService.port(port);
-    }
-
-
-    /**
-     * adds a collection of simulations to the simulator.
-     *
-     * @param simulations the collection of files to add to the emaulator
-     */
-    public static void addSimulations(Collection<WSSimulation> simulations) {
-/*
-        simulations.forEach(echoSimulationAsYaml -> {
-            try {
-                WSSimulator.addSimulation(echoSimulationAsYaml);
-                LOG.info("loaded YAML Simulation{}", echoSimulationAsYaml);
-            } catch (YamlNotValidException e) {
-                LOG.warn("Failed to load {}", echoSimulationAsYaml);
-            }
-        });*/
-    }
-
-    /**
-     * Returns the count of all simulations that are loaded within the simulator.
-     *
-     * @return the number of validate simulations.
-     */
-    public static int loadedSimulationCount() {
-        return wsSimulatorHandlerService.validSimulationCount();
-    }
-
-    /**
-     * Return the ID of a simulation path based on its logical path
-     *
-     * @param path       the path that the simulation
-     * @param httpMethod the httpmethod of the specification
-     * @return the id or -1 if not loaded.
-     */
-    public static int findSimulationId(@NotNull String path, @NotNull HttpMethod httpMethod) {
-        return wsSimulatorHandlerService.findSimulationIdByPath(path, httpMethod);
-    }
-
-    /**
-     * Return simulation path based on its logical path
-     *
-     * @param path       the path that the simulation
-     * @param httpMethod the httpmethod of the specification
-     * @return the found simulation
-     * @throws SimulationNotFoundException
-     */
-    public static WSSimulation findSimulation(@NotNull String path, @NotNull HttpMethod httpMethod) {
-        int simulationId = findSimulationId(path, httpMethod);
-        return wsSimulatorHandlerService.getWSSimulation(simulationId);
-    }
 
 }

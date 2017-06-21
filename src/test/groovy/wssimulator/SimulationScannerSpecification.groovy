@@ -203,119 +203,63 @@
  *
  */
 
-package wssimulator.scanner;
+package wssimulator
 
+import spock.lang.Specification
+import wssimulator.WSSimulation
 
-import org.apache.commons.io.IOUtils;
-import org.jetbrains.annotations.NotNull;
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import wssimulator.WSSimulation;
-import wssimulator.YamlToSimulation;
+import static wssimulator.scanner.SimulationFilters.byName
+import static wssimulator.scanner.SimulationFilters.byNamespace
+import static wssimulator.scanner.SimulationFilters.byPackagePrefix
+import static wssimulator.scanner.SimulationFilters.byPath
+import static wssimulator.scanner.SimulationFilters.filters
+import static wssimulator.scanner.SimulationFilters.forTest
+import static wssimulator.scanner.SimulationScanner.classPathScanner
+import static wssimulator.scanner.SimulationScanner.fileSystemScanner
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+/**
+ * Finds simulations on the classpath.
+    */
+class SimulationScannerSpecification extends Specification {
 
-public class SimulationScanner {
+    def "ClasspathSimulationScanner by regex"() {
+        when:
+        Collection<WSSimulation> scanner =
+                classPathScanner(filters(byPackagePrefix("scanner/classpath"), byPath("/publish99")))
+    then:
+    scanner.size() == 2
+}
 
-    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(SimulationScanner.class);
+def "File by namespace"() {
+    when:
+    Collection<WSSimulation> scanner =
+            classPathScanner(byNamespace("test.one"))
+    then:
+    scanner.size() == 3
+}
 
-    public static Collection<WSSimulation> classPathScanner(SimulationFilter simulationFilter) {
-        List<SearchFilter> searchFilters = searchFilters(simulationFilter);
-        Reflections reflections =
-                new Reflections(packagePrefixFilter(searchFilters), new ResourcesScanner());
-        Set<String> candidateClasspathLocations =
-                reflections.getResources(Pattern.compile(regexFilter(searchFilters)));
-        List<WSSimulation> candidateSimulations = classpathToSimulations(candidateClasspathLocations);
-        Collection<WSSimulation> wsSimulations = filterSimulationsByContent(candidateSimulations, simulationFilter);
-        LOG.info("matched {} simulations", wsSimulations.size());
-        return wsSimulations;
+    def "File by name"() {
+        when:
+        Collection<WSSimulation> scanner =
+                classPathScanner(byName("valid4"))
+        then:
+        scanner.size() == 1
     }
 
-    private static Collection<WSSimulation> filterSimulationsByContent(List<WSSimulation> candidateSimulations, SimulationFilter simulationFilter) {
-        ContentFilterPredicate contentFilterPredicate = new ContentFilterPredicate(simulationContentFilters(simulationFilter));
-        return candidateSimulations.stream().filter(contentFilterPredicate).collect(Collectors.toList());
-    }
-
-    private static List<WSSimulation> classpathToSimulations(Collection<String> candidateClasspathList) {
-        List<WSSimulation> list = new ArrayList<>();
-        for (String classPath : candidateClasspathList) {
-            String readClasspathResourceQuietly = readClasspathResourceQuietly(classPath);
-            if (readClasspathResourceQuietly.contains("path:")) {
-                WSSimulation wsSimulation = YamlToSimulation.toSimulation(classPath, readClasspathResourceQuietly);
-                if (wsSimulation != null) {
-                    list.add(wsSimulation);
-                }
-            }
-        }
-        return list;
+    def "File by name multiple"() {
+        when:
+        Collection<WSSimulation> scanner =
+                classPathScanner(filters(byPackagePrefix("scanner/classpath"),byName("valid3"),byName("valid4")))
+        then:
+        scanner.size() == 2
     }
 
 
-    @NotNull
-    private static String regexFilter(@NotNull List<SearchFilter> searchFilters) {
-        Optional<SearchFilter> regexFilter = searchFilters
-                .stream().filter(searchFilter -> searchFilter.filterType() == SimulationFilterType.FilterByRegex).findFirst();
-        return regexFilter.map(SearchFilter::filter).orElse(".*\\.yml");
-    }
-
-    @NotNull
-    private static String packagePrefixFilter(@NotNull List<SearchFilter> searchFilters) {
-        final StringBuilder packageFilterString = new StringBuilder("");
-        Optional<SearchFilter> regexFilter = searchFilters
-                .stream().filter(searchFilter -> searchFilter.filterType() == SimulationFilterType.FilterByPackagePrefix).findFirst();
-        regexFilter.ifPresent(searchFilter -> packageFilterString.append(searchFilter.filter()));
-        return packageFilterString.toString();
-    }
-
-    @NotNull
-    private static List<SearchFilter> searchFilters(@NotNull SimulationFilter filter) {
-        if (filter instanceof CompositeFilter)
-            return ((CompositeFilter) filter).searchFilters();
-        if (filter instanceof SearchFilter)
-            return Collections.singletonList((SearchFilter) filter);
-        return new ArrayList<>();
-    }
-
-    @NotNull
-    private static List<SimulationContentFilter> simulationContentFilters(@NotNull SimulationFilter filter) {
-        if (filter instanceof CompositeFilter)
-            return ((CompositeFilter) filter).simulationContentFilters();
-        if (filter instanceof SimulationContentFilter)
-            return Collections.singletonList((SimulationContentFilter) filter);
-        return new ArrayList<>();
-    }
-
-    public static String readClasspathResourceQuietly(String packageLocation) {
-        try {
-            InputStream resourceAsStream = SimulationScanner.class.getClassLoader()
-                    .getResourceAsStream(packageLocation);
-            return resourceAsStream == null ? "" : IOUtils.toString(resourceAsStream, Charset.defaultCharset());
-        } catch (IOException e) {
-            LOG.info("Couldn't read file {}", packageLocation);
-        }
-        return "";
-    }
-
-    static class ContentFilterPredicate implements Predicate<WSSimulation> {
-        private List<SimulationContentFilter> simulationContentFilters;
-
-        public ContentFilterPredicate(List<SimulationContentFilter> simulationContentFilters) {
-            this.simulationContentFilters = simulationContentFilters;
-        }
-
-        @Override
-        public boolean test(WSSimulation wsSimulation) {
-            for (SimulationContentFilter simulationContentFilter : simulationContentFilters) {
-                if (simulationContentFilter.include(wsSimulation))
-                    return true;
-            }
-            return false;
-        }
+    def "File by for test"() {
+        when:
+        Collection<WSSimulation> scanner =
+                classPathScanner(filters(byPackagePrefix("scanner/classpath"),forTest("A")))
+        then:
+        scanner.size() == 2
     }
 }

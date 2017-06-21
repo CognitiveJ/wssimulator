@@ -203,36 +203,21 @@
  *
  */
 
-package wssimulator
+package wssimulator.scanner;
 
-import spock.lang.Specification
-import wssimulator.WSSimulation
+import org.jetbrains.annotations.NotNull;
+import wssimulator.WSSimulation;
 
-import static wssimulator.scanner.SimulationFilters.byNamespace
-import static wssimulator.scanner.SimulationFilters.byPackagePrefix
-import static wssimulator.scanner.SimulationFilters.byPath
-import static wssimulator.scanner.SimulationFilters.filters
-import static wssimulator.scanner.SimulationScanner.classPathScanner
-import static wssimulator.scanner.SimulationScanner.fileSystemScanner
+public class FilterByName implements SimulationContentFilter {
 
-/**
- * Finds simulations on the classpath. 
- */
-class SimulationScanner extends Specification {
+    private String nameFilter;
 
-    def "ClasspathSimulationScanner by regex"() {
-        when:
-        Collection<WSSimulation> scanner =
-                classPathScanner(filters(byPackagePrefix("scanner/classpath"), byPath("/publish99")))
-        then:
-        scanner.size() == 1
+    public FilterByName(@NotNull String nameFilter) {
+        this.nameFilter = nameFilter;
     }
 
-    def "File by namespace"() {
-        when:
-        Collection<WSSimulation> scanner =
-                classPathScanner(byNamespace("test.one"))
-        then:
-        scanner.size() == 2
+    @Override
+    public boolean include(@NotNull WSSimulation wsSimulation) {
+        return nameFilter.equals(wsSimulation.name);
     }
 }

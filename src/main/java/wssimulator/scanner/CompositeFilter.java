@@ -242,7 +242,6 @@ public class CompositeFilter implements SimulationFilter {
             if (filter instanceof CompositeFilter)
                 throw new IllegalStateException("Nested Composite Filters is not allowed");
         }
-        //todo - only allowed 1 of each type of search filter.
     }
 
     @Override

@@ -215,7 +215,6 @@ public final class SimulationFilters {
         return new CompositeFilter(simulationFilters);
     }
 
-
     @NotNull
     public static FilterSimulationsByRegex byRegex(@NotNull String regex) {
         return new FilterSimulationsByRegex(regex);
@@ -232,9 +231,18 @@ public final class SimulationFilters {
     }
 
     @NotNull
+    public static FilterByName byName(@NotNull String nameFilter) {
+        return new FilterByName(nameFilter);
+    }
+
+    @NotNull
+    public static FilterByForTest forTest(@NotNull String forTestFilter) {
+        return new FilterByForTest(forTestFilter);
+    }
+
+    @NotNull
     public static FilterByNamespace byNamespace(@NotNull String namespaceFilter) {
         return new FilterByNamespace(namespaceFilter);
     }
-
 
 }

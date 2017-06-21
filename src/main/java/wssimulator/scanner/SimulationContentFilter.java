@@ -210,7 +210,7 @@ import wssimulator.WSSimulation;
 
 public interface SimulationContentFilter extends SimulationFilter {
 
-    boolean exclude(@NotNull WSSimulation wsSimulation);
+    boolean include(@NotNull WSSimulation wsSimulation);
 
     @Override
     default SimulationFilterType filterType() {

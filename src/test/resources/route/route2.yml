@@ -5,3 +5,4 @@ request:
         filterType: contains
         filter: Action2
 response: FilteredByAction2
+priority: 2

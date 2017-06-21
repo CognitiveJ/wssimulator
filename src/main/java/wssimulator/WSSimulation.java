@@ -242,12 +242,12 @@ public class WSSimulation {
     /**
      * An name to represent this call
      */
-    public String name="";
+    public String name = "";
 
     /**
      * Added latency for this call in milliseconds; supports ranged latency; e.g. (100-500)
      */
-    public String latency="0";
+    public String latency = "0";
 
     /**
      * sets the response code to send back to the caller
@@ -257,12 +257,17 @@ public class WSSimulation {
     /**
      * Default Response
      */
-    public String response="";
+    public String response = "";
 
     /**
      * Priority giving to this simulation.
      */
     public int priority = Integer.MAX_VALUE;
+
+    /**
+     * Grouping by logical test suite
+     */
+    public String forTest = "";
 
 
     /**

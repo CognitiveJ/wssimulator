@@ -219,7 +219,7 @@ public class FilterByNamespace implements SimulationContentFilter {
     }
 
     @Override
-    public boolean exclude(@NotNull WSSimulation wsSimulation) {
-        return !StringUtils.startsWith(wsSimulation.namespace, namespaceFilter);
+    public boolean include(@NotNull WSSimulation wsSimulation) {
+        return StringUtils.startsWith(wsSimulation.namespace, namespaceFilter);
     }
 }

@@ -1,2 +1,4 @@
 path: /publish2
 response: hello world
+name: valid3
+forTest: C

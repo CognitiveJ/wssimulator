@@ -220,7 +220,7 @@ public class FilterByPath implements SimulationContentFilter {
     }
 
     @Override
-    public boolean exclude(@NotNull WSSimulation wsSimulation) {
-        return !pathFilter.equals(wsSimulation.path);
+    public boolean include(@NotNull WSSimulation wsSimulation) {
+        return pathFilter.equals(wsSimulation.path);
     }
 }

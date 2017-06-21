@@ -17,7 +17,7 @@ class LoadClasspathResponseSpecification extends Specification {
         def simulator = WSSimulator.simulator(port)
         when:
         simulator.addSimulations(classPathScanner(filters(byPackagePrefix("file"),
-                byNamespace("test.file.load"))))
+                byNamespace("test.file.load.simple"))))
         then:
         given().port(port).get("/hello").then().assertThat()
                 .statusCode(200).and().body(equalTo("abc123"))

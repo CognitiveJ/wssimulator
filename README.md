@@ -114,22 +114,6 @@ repositories {
 
 ### Examples when using WSSimulator within your application
 
-######  Example with JSON/XML Validation
-```java
-public static void main(String[] args) throws URISyntaxException {
-        WSSimulator.addSimulation(new File(ValidationExample.class.getResource("/json/json1.yml").toURI()));
-        WSSimulator.addSimulation(new File(ValidationExample.class.getResource("/xml/xmlValidationExample.yml").toURI()));
-    }
-```
- 
-###### SOAP Example (Launches valid WSDL & Endpoint Simulations) 
-```java
-public static void main(String[] args) throws URISyntaxException {
-        WSSimulator.addSimulation(new File(SOAPExample.class.getResource("/soap/wsdl.yml").toURI()));
-        WSSimulator.addSimulation(new File(SOAPExample.class.getResource("/soap/endpoint.yml").toURI()));
-    }
-```
-
 Further Examples can be found on [here](https://github.com/CognitiveJ/wssimulator/tree/master/src/test/groovy/wssimulator "Tests").
 
 ### Validation

@@ -1,0 +1,3 @@
+path: /hello
+response: wssimulatorRequest:response.txt
+namespace: test.file.load.relative

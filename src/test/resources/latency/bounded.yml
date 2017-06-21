@@ -1,0 +1,4 @@
+path: /hello
+namespace: test.latency.bounded
+response: hello world
+latency: 5000-7600

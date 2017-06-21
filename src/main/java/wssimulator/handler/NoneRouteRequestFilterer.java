@@ -214,7 +214,7 @@ import wssimulator.WSSimulation;
  */
 public class NoneRouteRequestFilterer implements RouteRequestFilterer {
     @Override
-    public boolean filter(@NotNull WSSimulation wsSimulation, Request request) {
+    public boolean filter(@NotNull WSSimulation simulation, Request request) {
         return true;
     }
 }

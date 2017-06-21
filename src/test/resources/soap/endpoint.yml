@@ -1,9 +1,0 @@
-path: /CurrencyConvertor.asmx
-httpMethod: post
-response: <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-             <soap:Body>
-                <ConversionRateResponse xmlns="http://www.webserviceX.NET/">
-                   <ConversionRateResult>999</ConversionRateResult>
-                </ConversionRateResponse>
-             </soap:Body>
-          </soap:Envelope>

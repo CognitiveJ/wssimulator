@@ -207,155 +207,27 @@ package wssimulator;
 
 
 import org.jetbrains.annotations.NotNull;
-import spark.Spark;
 
 import java.io.File;
 import java.util.Collection;
 
 /**
- * Base simulator for web services.
+ * Base simulator for public services.
  */
 public final class WSSimulator {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
-    private static WSSimulatorServiceManager wsSimulatorServiceManager = WSSimulatorServiceManager.getInstance();
 
-    /**
-     * Apply a simulation to be emulated
-     *
-     * @param yamlString YAML as a String
-     */
-    public static void addSimulation(@NotNull String yamlString) {
-        LOG.info("adding simulation string: {}", yamlString);
-        YamlToSimulation yamlToSimulation = new YamlToSimulation(yamlString);
-        wsSimulatorServiceManager.add(yamlToSimulation.simulatorSimulation());
+    public static Simulator simulator(int onPort) {
+        LOG.info("creating simulator on assignedPort:{}", onPort);
+        Simulator simulator = new Simulator();
+        simulator.setPort(onPort);
+        return simulator;
+    }
+
+    public static Simulator simulator() {
+        LOG.info("creating simulator");
+        return new Simulator();
     }
 
 
-    /**
-     * Apply a simulation to be emulated
-     *
-     * @param classpathLocation YAML location on classpath
-     */
-    public static void addSimulationOnClasspath(@NotNull String classpathLocation) {
-        LOG.info("adding simulation on classpath: {}", classpathLocation);
-        YamlToSimulation yamlToSimulation = new YamlToSimulation(new File(WSSimulator.class.getResource(classpathLocation).getFile()));
-        wsSimulatorServiceManager.add(yamlToSimulation.simulatorSimulation());
-    }
-
-    /**
-     * Apply a simulation to be emulated
-     *
-     * @param WSSimulation the WSSimulation
-     * @return the WSSimulationContext of this simulation
-     */
-    public static WSSimulationContext addSimulation(@NotNull WSSimulation WSSimulation) {
-        return wsSimulatorServiceManager.add(WSSimulation);
-    }
-
-
-    /**
-     * Adds a simulation from a YAML file
-     *
-     * @param echoSimulationAsYaml the yaml file
-     * @return the WSSimulationContext of this simulation
-     */
-    public static WSSimulationContext addSimulation(@NotNull File echoSimulationAsYaml) {
-        LOG.info("adding simulation file: {}", echoSimulationAsYaml);
-        YamlToSimulation yamlToSimulation = new YamlToSimulation(echoSimulationAsYaml);
-        return addSimulation(yamlToSimulation.simulatorSimulation());
-    }
-
-    /**
-     * Shuts down the simulator
-     */
-    public static void shutdown() {
-        LOG.info("Shutting down server");
-        wsSimulatorServiceManager.shutdown();
-    }
-
-    /**
-     * Sets the port to start the http server.
-     *
-     * @param port the port number
-     */
-    public static void setPort(int port) {
-        LOG.info("setting port to {}", port);
-        Spark.port(port);
-    }
-
-
-    /**
-     * adds a collection of simulations to the simulator.
-     *
-     * @param simulations the collection of files to add to the emaulator
-     */
-    public static void addSimulations(Collection<File> simulations) {
-
-        simulations.forEach(echoSimulationAsYaml -> {
-            try {
-                WSSimulator.addSimulation(echoSimulationAsYaml);
-                LOG.info("loaded YAML Simulation{}", echoSimulationAsYaml);
-            } catch (YamlNotValidException e) {
-                LOG.warn("Failed to load {}", echoSimulationAsYaml);
-            }
-        });
-    }
-
-    /**
-     * Returns the count of all simulations that are loaded within the simulator.
-     *
-     * @return the number of validate simulations.
-     */
-    public static int loadedSimulationCount() {
-        return wsSimulatorServiceManager.validSimulationCount();
-    }
-
-    /**
-     * Holds the times a simulation has been called.
-     *
-     * @param simulationId - the simulation id
-     * @return the number of times a service has been called.
-     * @deprecated use {@link WSSimulationContext#callCount()}
-     */
-    public static int calledCount(int simulationId) {
-        return wsSimulatorServiceManager.calledCounter(simulationId);
-    }
-
-
-    /**
-     * Returns the last request for a given simulation.
-     *
-     * @param simulationId - the simulation id
-     * @return the the text of the last request
-     * @deprecated use {@link WSSimulationContext#lastMessage()} ()}
-     */
-    public static String lastRequest(int simulationId) {
-        return wsSimulatorServiceManager.lastRequest(simulationId);
-    }
-
-
-    /**
-     * Return the ID of a simulation path based on its logical path
-     *
-     * @param path       the path that the simulation
-     * @param httpMethod the httpmethod of the specification
-     * @return the id or -1 if not loaded.
-     */
-    public static int findSimulationId(@NotNull String path, @NotNull HttpMethod httpMethod) {
-        int simulationIdByPath = wsSimulatorServiceManager.findSimulationIdByPath(path, httpMethod);
-        return simulationIdByPath;
-    }
-
-    /**
-     * Return simulation path based on its logical path
-     *
-     * @param path       the path that the simulation
-     * @param httpMethod the httpmethod of the specification
-     * @return the found simulation
-     * @throws SimulationNotFoundException
-     */
-    public static WSSimulation findSimulation(@NotNull String path, @NotNull HttpMethod httpMethod) {
-        int simulationId = findSimulationId(path, httpMethod);
-        return wsSimulatorServiceManager.getWSSimulation(simulationId);
-    }
 }

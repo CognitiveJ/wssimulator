@@ -220,18 +220,12 @@ public class WSSimulatorRequest {
      */
     public String filter = "";
 
-    /**
-     * Validate the structure of the request.
-     */
-    public String requestStructure = "";
-
 
     @Override
     public String toString() {
         return "WSSimulatorRequest{" +
-                "requestStructure='" + requestStructure + '\'' +
+                "filterType=" + filterType +
                 ", filter='" + filter + '\'' +
-                ", filterType=" + filterType +
                 '}';
     }
 }

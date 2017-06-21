@@ -1,4 +1,6 @@
 path: /publish
+namespace: test.route.filter
 httpMethod: post
 response: FilteredByAction4
+priority: 4
 

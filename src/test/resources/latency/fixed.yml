@@ -1,0 +1,4 @@
+path: /hello
+namespace: test.latency.simple
+response: hello world
+latency: 5000

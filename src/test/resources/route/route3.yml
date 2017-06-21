@@ -1,6 +1,8 @@
 path: /publish
 httpMethod: post
+namespace: test.route.filter
 request:
         filterType: contains
         filter: Action3
 response: FilteredByAction3
+priority: 3

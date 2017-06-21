@@ -1,0 +1,5 @@
+path: /publish99
+namespace: test.one
+response: hello world
+name: valid4
+forTest: A

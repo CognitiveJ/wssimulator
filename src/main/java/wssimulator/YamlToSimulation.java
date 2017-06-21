@@ -208,7 +208,9 @@ package wssimulator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -220,35 +222,20 @@ import java.nio.charset.Charset;
  */
 public class YamlToSimulation {
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(YamlToSimulation.class);
-    private File yamlFile;
-    private String yamlString;
 
-    public YamlToSimulation(@NotNull File yamlFile) {
-        this.yamlFile = yamlFile;
-    }
-
-    public YamlToSimulation(@NotNull String yamlString) {
-        this.yamlString = yamlString;
-    }
-
-    @NotNull
-    public WSSimulation simulatorSimulation() {
-        if (yamlFile != null)
-            try {
-                yamlString = FileUtils.readFileToString(yamlFile, Charset.defaultCharset());
-            } catch (IOException e) {
-                LOG.error(String.format("Could not read yaml file:(%s)", yamlFile), e);
-                throw new YamlNotValidException("Cannot read file");
-            }
+    @Nullable
+    public static WSSimulation toSimulation(String classPath, @NotNull String yamlString) {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        WSSimulation simulation;
+        WSSimulation simulation = null;
         try {
             simulation = mapper.readValue(yamlString, WSSimulation.class);
+            simulation.onClassPath = classPath;
         } catch (Exception e) {
-            LOG.error(String.format("Could not parse yaml file:(%s)", yamlFile), e);
-            throw new YamlNotValidException(String.format("Could not parse yaml file:(%s)", yamlFile));
+            LOG.info(String.format("Could not parse yaml started:(%s)", StringUtils.substring(yamlString, 0, 20)));
+            LOG.info(String.format("Could not parse yaml:(%s)", yamlString), e);
         }
         return simulation;
-
     }
+
+
 }

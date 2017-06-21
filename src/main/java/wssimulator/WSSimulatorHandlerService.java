@@ -206,87 +206,167 @@
 package wssimulator;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import spark.Service;
+import wssimulator.handler.BaseHandler;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- * Context object that provides a running view of the simulation.
+ * Manages the service raise
  */
-public class WSSimulationContext {
+public class WSSimulatorHandlerService {
+    private int counter = 0;
+    private Map<String, BaseHandler> handlers = new HashMap<>();
+    private Map<Integer, WSSimulation> validSimulations = new HashMap<>();
 
-    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulator.class);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(WSSimulatorHandlerService.class);
+    private int assignedPort = 0;
+    private Map<Integer, Service> simulationServers = new HashMap<>();
 
-    private List<String> messages = new ArrayList<>();
 
-    private CountDownLatch countDownLatch;
-    /**
-     * identification for this simulation
-     */
-    public int id;
+    void assignedPort(int port) {
+        this.assignedPort = port;
+        simulationServers.put(port, igniteService(port, 10));
 
-    /**
-     * Holds the request just received for this simulation
-     *
-     * @param request - the request
-     */
-    public void simulationInvoked(String request) {
-        messages.add(request);
-        if (countDownLatch != null)
-            countDownLatch.countDown();
+    }
+
+    @NotNull
+    private Service igniteService(int port, int threads) {
+        return Service.ignite()
+                .port(port).threadPool(threads);
     }
 
     /**
-     * The number of timesk this simulation has been called.
+     * Adds and starts a simulator simulation
      *
-     * @return the number of times called
+     * @param simulation the simulation to be added
+     * @return the WSResponse object of this simulation
      */
-    public int callCount() {
-        return messages.size();
-    }
-
-    /**
-     * Last message to reach the simulation
-     *
-     * @return the last message
-     */
-    public String lastMessage() {
-        return messages.size() - 1 >= 0 ? messages.get(messages.size() - 1) : "";
+    public WSSimulationContext add(@NotNull WSSimulation simulation) {
+        WSSimulatorValidation.validate(simulation);
+        return setupRoute(simulation);
     }
 
 
     /**
-     * All received messages to reach the simulation
+     * Sets up a new route within spark.
      *
-     * @return the last message
+     * @param simulation the simulator simulation to setup.
      */
-    public List<String> messages() {
-        return messages;
-    }
-
-    /**
-     * Blocks the current thread until this simulation is called.
-     */
-    public void blockUntilCalled() {
-        blockUntilCalled(Integer.MAX_VALUE, TimeUnit.DAYS);
-    }
-
-
-    /**
-     * Blocks the current thread until this simulation is called.
-     *
-     * @param timeout  the timeout length
-     * @param timeUnit the unit of time to lock for
-     */
-    public void blockUntilCalled(int timeout, TimeUnit timeUnit) {
-        try {
-            countDownLatch = new CountDownLatch(1);
-            countDownLatch.await(timeout, timeUnit);
-            countDownLatch = null;
-        } catch (InterruptedException e) {
-            LOG.error("Interrupted", e);
+    private WSSimulationContext setupRoute(@NotNull WSSimulation simulation) {
+        Service simulationServer = simulationServers.get(assignedPort);
+        BaseHandler handler = lookupHandler(simulation);
+        validSimulations.put(++counter, simulation);
+        simulation.wsSimulationContext.id = counter;
+        if (handler.routeCount() == 1) {
+            switch (simulation.httpMethod) {
+                case get:
+                    simulationServer.get(simulation.path, handler::processRequest);
+                    LOG.info("GET {} now listening", simulation.path);
+                    break;
+                case post:
+                    simulationServer.post(simulation.path, handler::processRequest);
+                    LOG.info("POST {} now listening", simulation.path);
+                    break;
+                case put:
+                    simulationServer.put(simulation.path, handler::processRequest);
+                    LOG.info("PUT {} now listening", simulation.path);
+                    break;
+                case patch:
+                    simulationServer.patch(simulation.path, handler::processRequest);
+                    LOG.info("PATCH {} now listening", simulation.path);
+                    break;
+                case delete:
+                    simulationServer.delete(simulation.path, handler::processRequest);
+                    LOG.info("DELETE {} now listening", simulation.path);
+                    break;
+                case head:
+                    simulationServer.head(simulation.path, handler::processRequest);
+                    LOG.info("HEAD {} now listening", simulation.path);
+                    break;
+            }
         }
+        return simulation.wsSimulationContext;
+    }
 
+    private BaseHandler lookupHandler(@NotNull WSSimulation wsSimulation) {
+        BaseHandler baseHandler;
+        baseHandler = handlers.computeIfAbsent(wsSimulation.path + "::" + wsSimulation.httpMethod, s -> new BaseHandler());
+        baseHandler.addRoute(wsSimulation);
+        return baseHandler;
+    }
+
+    /**
+     * Shuts down the simulator.
+     */
+    void shutdownAll() {
+        simulationServers.forEach((integer, service) -> service.stop());
+        simulationServers.clear();
+        validSimulations.clear();
+        handlers.clear();
+        counter = 0;
+    }
+
+    /**
+     * Returns the valid simulation count.
+     *
+     * @return the number of valid specifications.
+     */
+    int validSimulationCount() {
+        return validSimulations.size();
+    }
+
+
+    /**
+     * returns a simulation if available (by simulation id).
+     *
+     * @param simulationId The id of the simulation.
+     * @return the wssimulation or null if not found.
+     */
+    @Nullable
+    WSSimulation getWSSimulation(int simulationId) {
+        WSSimulation wsSimulation = validSimulations.get(simulationId);
+        if (wsSimulation == null)
+            throw new SimulationNotFoundException(simulationId);
+        return wsSimulation;
+    }
+
+    public int findSimulationIdByPath(@NotNull String path, @NotNull HttpMethod httpMethod) {
+        return validSimulations.entrySet()
+                .stream()
+                .filter(e -> e.getValue().path.equalsIgnoreCase(path) && e.getValue().httpMethod.equals(httpMethod))
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElse(-1);
+    }
+
+    @NotNull
+    Collection<WSSimulation> findSimulationsNamespace(@NotNull String namespace) {
+        return validSimulations
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue().namespace.startsWith(namespace))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+
+    }
+
+    @NotNull
+    public Map<Integer, WSSimulation> validSimulations() {
+        return validSimulations;
+    }
+
+    public WSSimulation findSimulationByName(@NotNull String name) {
+        return getWSSimulation(validSimulations.entrySet()
+                .stream()
+                .filter(e -> name.equalsIgnoreCase(e.getValue().name))
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElse(-1));
     }
 }

@@ -1,0 +1,3 @@
+path: /hello
+response: wssimulatorRequest:file/nofound.txt
+namespace: test.file.load.not.found

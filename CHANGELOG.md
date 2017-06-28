@@ -1,3 +1,7 @@
+
+# 0.3.2 (15/06/2016)
+- updated helper methods
+
 # 0.2.12 (15/11/2016)
 - Allowed for all messages to be returned
  

@@ -4,6 +4,7 @@ package wssimulator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.List;
 
 public class Simulator {
     private WSSimulatorHandlerService wsSimulatorHandlerService = new WSSimulatorHandlerService();
@@ -78,10 +79,23 @@ public class Simulator {
     }
 
 
+    /**
+     * Return all simulations listening on a path based on its logical path
+     *
+     * @param path       the path that the simulation
+     * @param httpMethod the httpmethod of the specification
+     * @return the found simulation(s)
+     * @throws SimulationNotFoundException when simulation isn't found
+     */
+    public List<WSSimulation> findSimulationsByPath(@NotNull String path, @NotNull HttpMethod httpMethod) {
+        return wsSimulatorHandlerService.findSimulationsByPath(path,httpMethod);
+    }
+
 
     /**
      * Return the Simulation of a simulation path based on its name.
-     * @param name       the name of the simulation
+     *
+     * @param name the name of the simulation
      * @return the id or -1 if not loaded.
      */
     public WSSimulation findSimulationByName(@NotNull String name) {

@@ -213,6 +213,7 @@ import wssimulator.handler.BaseHandler;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -368,5 +369,13 @@ public class WSSimulatorHandlerService {
                 .findFirst()
                 .map(Map.Entry::getKey)
                 .orElse(-1));
+    }
+
+    public List<WSSimulation> findSimulationsByPath(String path, HttpMethod httpMethod) {
+        return validSimulations.entrySet()
+                .stream()
+                .filter(e -> e.getValue().path.equalsIgnoreCase(path) && e.getValue().httpMethod.equals(httpMethod))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
     }
 }
